@@ -4,7 +4,8 @@
 
 module Amelie.Controller
   (runHandler
-  ,output)
+  ,output
+  ,outputText)
   where
 
 import Amelie.Types
@@ -12,7 +13,7 @@ import Amelie.Model.Config        (auth)
 
 import Control.Monad.IO
 import Control.Monad.Reader       (runReaderT)
-import Data.Text.Lazy             (toStrict)
+import Data.Text.Lazy             (Text,toStrict)
 import Database.PostgreSQL.Simple (connect)
 import Snap.Types                 (Snap,writeText)
 import Text.Blaze                 (Html)
@@ -29,6 +30,12 @@ runHandler ctrl = do
 --   This ensures that any lazy exceptions are caught by the Snap
 --   handler.
 output :: Html -> Controller ()
-output html = do
-  let !x = toStrict $ renderHtml $ html
-  writeText $ x
+output html = outputText $ renderHtml $ html
+
+-- | Strictly renders text before outputting it via Snap.
+--   This ensures that any lazy exceptions are caught by the Snap
+--   handler.
+outputText :: Text -> Controller ()
+outputText text = do
+  let !x = toStrict $ text
+  writeText x

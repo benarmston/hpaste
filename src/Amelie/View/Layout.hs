@@ -19,7 +19,8 @@ layoutPage Page{..} = do
   docTypeHtml $ do
     html $ do
       meta ! A.httpEquiv "Content-Type" ! A.content "text/html; charset=UTF-8"
-      title $ text $ pageTitle
+      link ! A.rel "stylesheet" ! A.type_ "text/css" ! A.href "/css/amelie.css"
+      title $ toHtml $ pageTitle
     body $
       wrap $ do
         logo
