@@ -30,7 +30,8 @@ layoutPage Page{..} = do
 -- | Show the hpaste logo.
 logo :: Html
 logo = do
-  img ! aClass "logo" ! A.src "/css/hpaste.png"
+  a ! A.href "/" ! A.title "Back to home" $ do
+    img ! aClass "logo" ! A.src "/css/hpaste.png"
 
 -- | Layout wrapper.
 wrap :: Html -> Html

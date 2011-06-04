@@ -21,7 +21,8 @@ style = renderCSS $ runCSS $ do
     textAlign "center"
     
   classRule "logo" $ do
-    margin "0 0 1em 0"
+    margin "1em 0 1em 0"
+    border "0"
   
   classRule "wrap" $ do
     maxWidth "50em"
@@ -36,7 +37,7 @@ style = renderCSS $ runCSS $ do
      
     subRule "h2" $ do
       margin "0"
-      fontSize "1em"
+      fontSize "1.2em"
       padding "0 0 0.5em 0"
   
   classRule "section-dark" $ do
