@@ -1,0 +1,8 @@
+#! /bin/bash
+
+mkdir log -p
+echo 'Killing ...'
+killall amelie
+sleep 1
+echo 'Starting ...'
+dist/build/amelie/amelie & disown
