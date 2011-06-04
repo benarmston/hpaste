@@ -11,7 +11,7 @@ import Amelie.Types
 import Amelie.Model
 
 getLatestPastes :: Model [Paste]
-getLatestPastes = queryNoParams ["SELECT title,author,language,channel,content"
+getLatestPastes = queryNoParams ["SELECT created,title,author,language,channel,content"
                                 ,"FROM toplevel_paste"
                                 ,"ORDER BY id DESC"
                                 ,"LIMIT 10"]

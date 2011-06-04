@@ -11,7 +11,9 @@ module Amelie.View.Home
 import           Amelie.Types
 import           Amelie.View.Layout
 
+import           Data.Maybe                  (fromMaybe)
 import           Data.Text                   (Text)
+import           Data.Time.Show              (showDateTime)
 import           Text.Blaze.Html5            as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
@@ -25,11 +27,15 @@ page ps =
 
 -- | View the latest pastes.
 latest :: [Paste] -> Html
-latest ps =
+latest ps = do
+  h2 "Latest pastes"
   table $ do
-    tr $ do th $ toHtml ("Title" :: Text) 
-            th $ toHtml ("Author" :: Text)
+    tr $ mapM_ (th . toHtml) $ words "Title Author When Language Channel"
     pastes ps
+
     where pastes = mapM_ $ \Paste{..} -> tr $ do
                      td $ toHtml pasteTitle
                      td $ toHtml pasteAuthor
+                     td $ toHtml $ showDateTime $ pasteDate
+                     td $ toHtml $ fromMaybe "-" pasteLanguage
+                     td $ toHtml $ fromMaybe "-" pasteChannel

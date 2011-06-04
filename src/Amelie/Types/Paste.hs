@@ -10,12 +10,14 @@ module Amelie.Types.Paste
        where
 
 import Data.Text                               (Text,pack)
+import Data.Time                               (UTCTime,zonedTimeToUTC)
 import Database.PostgreSQL.Simple.QueryResults (QueryResults(..))
 import Text.Blaze                              (ToHtml(..),toHtml)
 
 -- | A paste.
 data Paste = Paste {
    pasteTitle    :: Text
+  ,pasteDate     :: UTCTime
   ,pasteAuthor   :: Text
   ,pasteLanguage :: Maybe Text
   ,pasteChannel  :: Maybe Text
@@ -32,5 +34,6 @@ instance QueryResults Paste where
     , pasteLanguage = language
     , pasteChannel = channel
     , pastePaste = paste
+    , pasteDate = zonedTimeToUTC date
     }
-    where (title,author,language,channel,paste) = convertResults field values
+    where (date,title,author,language,channel,paste) = convertResults field values
