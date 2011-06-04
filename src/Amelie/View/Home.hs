@@ -1,4 +1,4 @@
-{-# OPTIONS -Wall #-}
+{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -18,12 +18,24 @@ import           Text.Blaze.Html5            as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
 -- | Render the home page.
-page :: [Paste] -> Html
-page ps =
+page :: [Paste] -> Html -> Html
+page ps form =
   layoutPage $ Page {
     pageTitle = "λ Knights!"
-  , pageBody = latest ps
+  , pageBody = content ps form
   }
+
+-- | Render the home page body.
+content :: [Paste] -> Html -> Html
+content ps form = do
+  createNew form
+  latest ps
+
+createNew :: Html -> Html
+createNew form = do
+  H.div ! aClasses ["section","section-light"] $ do
+    h2 "Create new paste"
+    form
 
 -- | View the latest pastes.
 latest :: [Paste] -> Html

@@ -9,6 +9,7 @@ module Amelie.View.Layout
   where
 
 import           Amelie.Types
+import           Amelie.View.Html
 
 import           Text.Blaze.Html5            as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
@@ -29,8 +30,8 @@ layoutPage Page{..} = do
 -- | Show the hpaste logo.
 logo :: Html
 logo = do
-  img ! A.src "/css/hpaste.png"
+  img ! aClass "logo" ! A.src "/css/hpaste.png"
 
 -- | Layout wrapper.
 wrap :: Html -> Html
-wrap x = H.div ! A.class_ "amelie-wrap" $ x
+wrap x = H.div ! aClass "wrap" $ x

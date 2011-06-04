@@ -6,7 +6,8 @@
 -- | The paste type.
 
 module Amelie.Types.Paste
-       (Paste(..))
+       (Paste(..)
+       ,PasteSubmit(..))
        where
 
 import Data.Text                               (Text,pack)
@@ -22,6 +23,15 @@ data Paste = Paste {
   ,pasteLanguage :: Maybe Text
   ,pasteChannel  :: Maybe Text
   ,pastePaste    :: Text
+} deriving Show
+
+-- | A paste submission or edit.
+data PasteSubmit = PasteSubmit {
+   pasteSubmitTitle    :: Text
+  ,pasteSubmitAuthor   :: Text
+  ,pasteSubmitLanguage :: Maybe Text
+  ,pasteSubmitChannel  :: Maybe Text
+  ,pasteSubmitPaste    :: Text
 } deriving Show
 
 instance ToHtml Paste where

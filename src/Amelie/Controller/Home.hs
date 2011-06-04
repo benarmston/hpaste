@@ -7,12 +7,14 @@ module Amelie.Controller.Home
   (handle)
   where
 
-import Amelie.Controller        (output)
+import Amelie.Controller       (output)
+import Amelie.Controller.Paste (pasteForm)
 import Amelie.Model
-import Amelie.Model.Home        (getPastes)
-import Amelie.View.Home         (page)
+import Amelie.Model.Home       (getPastes)
+import Amelie.View.Home        (page)
 
 handle :: Controller ()
 handle = do
   pastes <- model $ getPastes
-  output $ page pastes
+  form <- pasteForm
+  output $ page pastes form

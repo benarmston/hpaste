@@ -14,4 +14,4 @@ getLatestPastes :: Model [Paste]
 getLatestPastes = queryNoParams ["SELECT created,title,author,language,channel,content"
                                 ,"FROM toplevel_paste"
                                 ,"ORDER BY id DESC"
-                                ,"LIMIT 10"]
+                                ,"LIMIT 20"]

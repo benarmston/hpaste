@@ -19,6 +19,9 @@ style = renderCSS $ runCSS $ do
     fontFamily "'DejaVu Sans', sans-serif"
     fontSize "13px"
     textAlign "center"
+    
+  classRule "logo" $ do
+    margin "0 0 1em 0"
   
   classRule "wrap" $ do
     maxWidth "50em"
@@ -29,6 +32,7 @@ style = renderCSS $ runCSS $ do
     borderRadius "5px"
     padding "10px"
     border "3px solid #000"
+    margin "0 0 1em 0"
      
     subRule "h2" $ do
       margin "0"
@@ -51,9 +55,9 @@ style = renderCSS $ runCSS $ do
       textDecoration "underline"
 
   classRule "section-light" $ do
-    background "#453D5B"
-    borderColor "#A9A0D2"
-    color "#FFF"
+    background "#FFF"
+    borderColor "#EEE"
+    color "#000"
 
     subRule "h2" $ do
       color "#2D2542"
