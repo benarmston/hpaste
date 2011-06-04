@@ -5,7 +5,8 @@
 module Main (main) where
 
 import Amelie.Controller
-import Amelie.Controller.Home as Home
+import Amelie.Controller.Home  as Home
+import Amelie.Controller.Paste as Paste
 import Amelie.Controller.Style as Style
 
 import Snap.Http.Server
@@ -25,4 +26,5 @@ serve = route routes where
   routes = [ ("/css/amelie.css", runHandler Style.handle)
            , ("/css/",serveDirectory "wwwroot/css")
            , ("",runHandler Home.handle)
+           , ("/:id",runHandler Paste.handle)
            ]

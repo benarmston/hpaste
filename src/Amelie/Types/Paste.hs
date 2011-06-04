@@ -10,6 +10,8 @@ module Amelie.Types.Paste
        ,PasteSubmit(..))
        where
 
+import Amelie.Types.Newtypes
+
 import Data.Text                               (Text,pack)
 import Data.Time                               (UTCTime,zonedTimeToUTC)
 import Database.PostgreSQL.Simple.QueryResults (QueryResults(..))
@@ -17,17 +19,21 @@ import Text.Blaze                              (ToHtml(..),toHtml)
 
 -- | A paste.
 data Paste = Paste {
-   pasteTitle    :: Text
+   pasteId       :: PasteId
+  ,pasteTitle    :: Text
   ,pasteDate     :: UTCTime
   ,pasteAuthor   :: Text
   ,pasteLanguage :: Maybe Text
   ,pasteChannel  :: Maybe Text
   ,pastePaste    :: Text
+  ,pasteViews    :: Integer 
+  ,pasteParent   :: Maybe PasteId
 } deriving Show
 
 -- | A paste submission or edit.
 data PasteSubmit = PasteSubmit {
-   pasteSubmitTitle    :: Text
+   pasteSubmitId       :: Maybe PasteId
+  ,pasteSubmitTitle    :: Text
   ,pasteSubmitAuthor   :: Text
   ,pasteSubmitLanguage :: Maybe Text
   ,pasteSubmitChannel  :: Maybe Text
@@ -43,7 +49,11 @@ instance QueryResults Paste where
     , pasteAuthor = author
     , pasteLanguage = language
     , pasteChannel = channel
-    , pastePaste = paste
+    , pastePaste = content
     , pasteDate = zonedTimeToUTC date
+    , pasteId = pid
+    , pasteViews = views
+    , pasteParent = parent
     }
-    where (date,title,author,language,channel,paste) = convertResults field values
+    where (pid,title,content,author,date,views,language,channel,parent) =
+            convertResults field values
