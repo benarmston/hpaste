@@ -13,7 +13,10 @@ import           Amelie.View.Html
 import           Amelie.View.Layout
 
 import           Data.Maybe                  (fromMaybe)
+import           Data.Monoid.Operator        ((++))
+import           Data.String                 (fromString)
 import           Data.Time.Show              (showDateTime)
+import           Prelude                     hiding ((++))
 import           Text.Blaze.Html5            as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
@@ -47,9 +50,11 @@ latest ps = do
       pastes ps
 
     where pastes = mapM_ $ \Paste{..} -> tr $ do
-                     td $ href $ toHtml pasteTitle
+                     let pid = fromIntegral pasteId :: Integer
+                     td $ href pid $ toHtml pasteTitle
                      td $ toHtml pasteAuthor
                      td $ toHtml $ showDateTime $ pasteDate
                      td $ toHtml $ fromMaybe "-" pasteLanguage
                      td $ toHtml $ fromMaybe "-" pasteChannel
-            where href = H.a ! A.href "x"
+            where href pid = H.a ! A.href ("/" ++ fromString (show pid))
+                  
