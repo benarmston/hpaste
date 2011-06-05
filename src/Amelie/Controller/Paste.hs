@@ -44,8 +44,10 @@ pasteForm :: Controller Html
 pasteForm = do
   params <- getParams
   submitted <- isJust <$> getParam "submit"
-  let (getValue,html) = pasteFormlet params submitted []
+  let (getValue,_) = pasteFormlet params submitted []
       value = formletValue getValue params
+      errors = either id (const []) value
+      (_,html) = pasteFormlet params submitted errors
       val = either (const Nothing) Just $ value
   case val of
     Nothing    -> return ()

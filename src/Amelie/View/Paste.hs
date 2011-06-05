@@ -40,17 +40,15 @@ pasteFormlet params submitted errors =
   let form = postForm $ do
         formletHtml formlet params
         submitInput "submit" "Submit"
-        when submitted $
-          when (not (null errors)) $
-            mapM_ (p . toHtml) errors
+        when submitted $ mapM_ (p . toHtml) errors
   in (formlet,form)
   
     where formlet =
             PasteSubmit <$> pure pasteId
                         <*> req (textInput "title" "Title")
                         <*> req (textInput "author" "Author")
-                        <*> opt (dropInput "language" "Language")
-                        <*> opt (dropInput "channel" "Channel")
+                        <*> pure Nothing -- opt (dropInput "language" "Language")
+                        <*> pure Nothing -- opt (dropInput "channel" "Channel")
                         <*> req (areaInput "paste" "Paste")
           pasteId = M.lookup "paste_id" params >>=
                     readMay . concat . map toString >>=
