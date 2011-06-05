@@ -110,11 +110,15 @@ highlighter = do
     subRule "pre" $ do
       margin "0"
 
+    subRule "td" $ do
+      verticalAlign "top"
+
 -- | Tokens colours and styles.
 tokens :: CSS (Either Property Rule)
 tokens = do
   subRule ".highlight" $ do
     tokenColor "cm" "#555"
+    tokenColor "c1" "#555"
     tokenColor "kr" "#397460"
     tokenColor "s" "#366354"
     tokenColor "sc" "#366354"
@@ -124,6 +128,9 @@ tokens = do
     tokenColor "o" "#3E394D"
     tokenColor "n" "#343634"
     tokenColor "nf" "#222"
+    -- This is a weird one.
+    subRule ".c1 + .t" $ do
+      display "none"
 
   where token name props = subRule ("." ++ name) $ props
         tokenColor name col = token name $ color col

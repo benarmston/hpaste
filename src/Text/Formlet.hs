@@ -20,7 +20,6 @@ import           Control.Monad.Error
 import           Control.Monad.Reader
 import           Control.Monad.Trans.Error   (ErrorList(..))
 import           Control.Monad.Writer
-import           Data.List (nub)
 import qualified Data.Map                    as M
 import           Data.Maybe
 import           Data.Monoid.Operator
