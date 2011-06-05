@@ -3,6 +3,6 @@
 mkdir log -p
 echo 'Killing ...'
 killall amelie
-sleep 1
+sleep 0.2
 echo 'Starting ...'
 dist/build/amelie/amelie & disown

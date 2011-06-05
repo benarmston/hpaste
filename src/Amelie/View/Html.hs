@@ -1,4 +1,4 @@
-{-# OPTIONS -Wall #-}
+{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -6,7 +6,12 @@
 
 module Amelie.View.Html
   (aClass
-  ,aClasses)
+  ,aClasses
+  ,darkSection
+  ,lightSection
+  ,lightNoTitleSection
+  ,href
+  ,clear)
   where
 
 import           Data.Monoid.Operator        ((++))
@@ -25,3 +30,30 @@ aClasses :: [Text] -> Attribute
 aClasses names = A.class_ $
   toValue $ T.intercalate " " $ map ("amelie-" ++) names
 
+-- | A dark section.
+darkSection :: Text -> Html -> Html
+darkSection title inner =
+  H.div ! aClasses ["section","section-dark"] $ do
+    h2 $ toHtml title
+    inner
+
+-- | A light section.
+lightSection :: Text -> Html -> Html
+lightSection title inner =
+  H.div ! aClasses ["section","section-light"] $ do
+    h2 $ toHtml title
+    inner
+
+-- | A light section with no title.
+lightNoTitleSection :: Html -> Html
+lightNoTitleSection inner =
+  H.div ! aClasses ["section","section-light"] $ do
+    inner
+
+-- | An anchor link.
+href :: (ToValue location,ToHtml html) => location -> html -> Html
+href loc content = H.a ! A.href (toValue loc) $ toHtml content
+
+-- | A clear:both element.
+clear :: Html
+clear = H.div ! aClass "clear" $ return ()

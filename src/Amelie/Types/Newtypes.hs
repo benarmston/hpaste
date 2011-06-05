@@ -11,4 +11,6 @@ import Database.PostgreSQL.Simple.Result (Result)
 import Database.PostgreSQL.Simple.Param (Param)
 
 newtype PasteId = PasteId Integer
-  deriving (Show,Integral,Real,Num,Ord,Eq,Enum,Result,Param)
+  deriving (Integral,Real,Num,Ord,Eq,Enum,Result,Param)
+
+instance Show PasteId where show (PasteId pid) = show pid

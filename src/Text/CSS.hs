@@ -36,16 +36,18 @@ runBody = snd . runWriter . unCSS
 -- | Render a CSS AST to text, flat.
 renderCSS :: [Rule] -> Text
 renderCSS = mconcat . map renderRule where
-  renderRule (Rule _name [] _) = ""
+  renderRule (Rule _name [] []) = ""
   renderRule (Rule name props sub) =
-    name ++ "{" ++ renderProps props ++ "}" ++
+    parent ++
     renderCSS (map prefix sub)
-      where prefix subr@Rule{ruleExpr} =
+      where parent | null props = ""
+                   | otherwise = name ++ "{" ++ renderProps props ++ "}"
+            prefix subr@Rule{ruleExpr} =
               subr { ruleExpr = name ++ " " ++ ruleExpr }
   renderProps = T.intercalate ";" . map renderProp
   renderProp (Property name value) = name ++ ":" ++ value
 
--- | Render a CSS AST to text, flat.
+-- | Render a CSS AST to text, pretty.
 renderPrettyCSS :: [Rule] -> Text
 renderPrettyCSS = mconcat . map renderRule where
   renderRule (Rule name props sub) =
