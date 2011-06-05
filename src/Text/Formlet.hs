@@ -111,16 +111,17 @@ textInput :: Text -> Text -> Formlet Text
 textInput name caption =
   formlet name $ \value -> do
     p $ H.label $ do
-      toHtml $ caption ++ ": "
+      H.span $ toHtml $ caption ++ ": "
       input ! A.name (toValue name)
             ! A.value (toValue $ fromMaybe "" value)
+            ! A.class_ "text"
 
 -- | Make a textarea input with a label.
 areaInput :: Text -> Text -> Formlet Text
 areaInput name caption =
   formlet name $ \value -> do
     p $ H.label $ do
-      toHtml $ caption ++ ": "
+      H.span $ toHtml $ caption ++ ": "
       textarea ! A.name (toValue name) $ toHtml $ fromMaybe "" value
 
 -- | Make a drop down input with a label.
@@ -128,7 +129,7 @@ dropInput :: Text -> Text -> Formlet Text
 dropInput name caption =
   formlet name $ \value -> do
     p $ H.label $ do
-      toHtml $ caption ++ ": "
+      H.span $ toHtml $ caption ++ ": "
       input ! A.name (toValue name)
             ! A.value (toValue $ fromMaybe "" value)
 

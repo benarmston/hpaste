@@ -20,6 +20,7 @@ style = renderCSS $ runCSS $ do
   paste
   utils
   highlighter
+  form
   home
 
 -- | General layout styles.
@@ -37,6 +38,35 @@ layout = do
   classRule "wrap" $ do
     margin "auto"
     textAlign "left"
+
+-- | Paste form.
+form :: CSS Rule
+form = do
+  inputs
+  classRule "errors" $ do
+    color "#743838"
+    fontWeight "bold"
+
+-- | Input style.
+inputs :: CSS Rule
+inputs =
+  rule "form p label" $ do
+    subRule "textarea" $ do
+      width "100%"
+      height "20em"
+      clear "both"
+      margin "1em 0 0 0"
+         
+    subRule "textarea, input.text" $ do
+      border "2px solid #ddd"
+      borderRadius "4px"
+    subRule "textarea:focus, input.text:focus" $ do
+      background "#eee"
+      
+    subRule "span" $ do
+      float "left"
+      width "5em"
+      display "block"
 
 -- | Section styles.
 sections :: CSS Rule

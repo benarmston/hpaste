@@ -38,9 +38,12 @@ import           Text.Highlighter.Lexers.Haskell  (lexer)
 pasteFormlet :: Params -> Bool -> [Text] -> (Formlet PasteSubmit,Html)
 pasteFormlet params submitted errors =
   let form = postForm $ do
+        when submitted $
+          when (not (null errors)) $
+            H.div ! aClass "errors" $
+              mapM_ (p . toHtml) errors
         formletHtml formlet params
         submitInput "submit" "Submit"
-        when submitted $ mapM_ (p . toHtml) errors
   in (formlet,form)
   
     where formlet =
