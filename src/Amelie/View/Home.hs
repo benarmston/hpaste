@@ -25,6 +25,7 @@ page ps form =
   layoutPage $ Page {
     pageTitle = "λ Knights!"
   , pageBody = content ps form
+  , pageName = "home"
   }
 
 -- | Render the home page body.

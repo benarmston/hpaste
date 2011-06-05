@@ -14,4 +14,5 @@ import Text.Blaze (Html)
 data Page = Page {
     pageTitle :: Text
   , pageBody :: Html
+  , pageName :: Text
   }

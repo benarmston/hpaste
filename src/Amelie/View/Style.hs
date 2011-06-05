@@ -20,6 +20,7 @@ style = renderCSS $ runCSS $ do
   paste
   utils
   highlighter
+  home
 
 -- | General layout styles.
 layout :: CSS Rule
@@ -34,7 +35,6 @@ layout = do
     border "0"
   
   classRule "wrap" $ do
-    maxWidth "50em"
     margin "auto"
     textAlign "left"
 
@@ -137,3 +137,10 @@ lineNumbers = do
     subRule "a" $ do
       textDecoration "none"
       color "#555"
+
+-- | Home page styles.
+home :: CSS Rule
+home = do
+  rule "#home" $ do
+    subRule ".amelie-wrap" $ do
+      width "50em"

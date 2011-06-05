@@ -11,6 +11,8 @@ module Amelie.View.Layout
 import           Amelie.Types
 import           Amelie.View.Html
 
+import           Data.Monoid.Operator        ((++))
+import           Prelude                     hiding ((++))
 import           Text.Blaze.Html5            as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
@@ -21,11 +23,17 @@ layoutPage Page{..} = do
     html $ do
       meta ! A.httpEquiv "Content-Type" ! A.content "text/html; charset=UTF-8"
       link ! A.rel "stylesheet" ! A.type_ "text/css" ! A.href "/css/amelie.css"
+      js "jquery.js"
+      js "amelie.js"
       title $ toHtml $ pageTitle
-    body $
+    body ! A.id (toValue pageName) $
       wrap $ do
         logo
         pageBody
+    
+    where js s = script ! A.type_ "text/javascript"
+                        ! A.src ("/js/" ++ s) $
+                        return ()
 
 -- | Show the hpaste logo.
 logo :: Html

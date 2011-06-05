@@ -62,6 +62,7 @@ page p@Paste{..} =
   layoutPage $ Page {
     pageTitle = pasteTitle
   , pageBody = viewPaste p
+  , pageName = "paste"
   }
 
 -- | View a paste's details and content.

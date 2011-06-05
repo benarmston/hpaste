@@ -9,13 +9,10 @@ module Amelie.Controller
   where
 
 import Amelie.Types
-import Amelie.Model.Config        (auth)
 
-import Control.Monad.IO
 import Control.Monad.Reader       (runReaderT)
 import Data.Text.Lazy             (Text,toStrict)
 import Database.PostgreSQL.Simple (Pool,withPoolConnection)
-import Database.PostgreSQL.Simple (connect)
 import Snap.Types                 (Snap,writeText)
 import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)

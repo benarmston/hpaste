@@ -32,3 +32,4 @@ Executable amelie
                     ,old-locale    >= 1.0
                     ,safe          >= 0.3
                     ,highlighter   >= 0.2
+                    ,HJScript      >= 0.5
