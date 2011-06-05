@@ -18,13 +18,13 @@ import           Prelude                 hiding ((++),max)
 script :: Text
 script = pack $ show $ snd $ evalHJScript $ do
   ready $ do
-    each (setWidth (j$ string ".amelie-wrap")
+    each (setWidth (j ".amelie-wrap")
                    (mathMax (getWidth this' + 50) 500))
-         (j$ string ".highlighttable")
+         (j ".highlighttable")
 
 -- | jQuery selector.
-j :: Exp c -> JObject JQuery
-j = selectExpr
+j :: String -> JObject JQuery
+j = selectExpr . string
 
 -- | Set the width of a DOM element.
 setWidth :: JObject JQuery -> Exp Int -> HJScript ()
@@ -44,7 +44,7 @@ each script query
 
 -- | The jQuery 'this' object.
 this' :: JObject JQuery
-this' = j (this :: JObject JQuery)
+this' = selectExpr (this :: JObject JQuery)
 
 -- | Max.
 mathMax :: Exp a -> Exp a -> Exp a
