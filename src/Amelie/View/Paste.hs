@@ -70,13 +70,19 @@ pasteFormlet PasteFormlet{..} =
                          pfLanguages
 
 -- | Render the page page.
-page :: [Channel] -> [Language] -> Paste -> Html
-page chans langs p@Paste{..} =
+page :: [Channel] -> [Language] -> Paste -> [Paste] -> Html
+page chans langs p@Paste{..} as =
   layoutPage $ Page {
     pageTitle = pasteTitle
-  , pageBody = viewPaste chans langs p
+  , pageBody = do viewPaste chans langs p
+                  viewAnnotations chans langs as
   , pageName = "paste"
   }
+
+-- | View the paste's annotations.
+viewAnnotations :: [Channel] -> [Language] -> [Paste] -> Html
+viewAnnotations chans langs pastes = do
+  mapM_ (viewPaste chans langs) pastes
 
 -- | View a paste's details and content.
 viewPaste :: [Channel] -> [Language] -> Paste -> Html

@@ -7,7 +7,8 @@
 module Amelie.Model.Paste
   (getLatestPastes
   ,getPasteById
-  ,createOrEdit)
+  ,createOrEdit
+  ,getAnnotations)
   where
 
 import Amelie.Types
@@ -31,6 +32,14 @@ getPasteById pid =
                         ,"FROM public_paste"
                         ,"WHERE id = ?"]
                         (Only pid)
+
+-- | Get annotations of a paste.
+getAnnotations :: PasteId -> Model [Paste]
+getAnnotations pid =
+  query ["SELECT *"
+        ,"FROM public_paste"
+        ,"WHERE annotation_of = ?"]
+        (Only pid)
 
 -- | Create a paste, or update an existing one.
 createOrEdit :: PasteSubmit -> Model (Maybe PasteId)

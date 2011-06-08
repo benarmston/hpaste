@@ -16,7 +16,7 @@ import Amelie.Controller.Cache (cache,resetCache)
 import Amelie.Model
 import Amelie.Model.Channel    (getChannels)
 import Amelie.Model.Language   (getLanguages)
-import Amelie.Model.Paste      (createOrEdit,getPasteById)
+import Amelie.Model.Paste      (createOrEdit,getPasteById,getAnnotations)
 import Amelie.Types.Cache      as Key
 import Amelie.View.Paste       (pasteFormlet,page)
 
@@ -40,9 +40,10 @@ handle = do
     Just (pid :: Integer) -> do
       html <- cache (Key.Paste pid) $ do
         paste <- model $ getPasteById (fromIntegral pid)
+        pastes <- model $ getAnnotations (fromIntegral pid)
         chans <- model $ getChannels
         langs <- model $ getLanguages
-        return $ page chans langs <$> paste
+        return $ flip (page chans langs) pastes <$> paste
       case html of
         Just html -> outputText html
         Nothing   -> goHome
