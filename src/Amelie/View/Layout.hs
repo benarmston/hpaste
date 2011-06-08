@@ -30,6 +30,7 @@ layoutPage Page{..} = do
       wrap $ do
         logo
         pageBody
+        foot
     
     where js s = script ! A.type_ "text/javascript"
                         ! A.src ("/js/" ++ s) $
@@ -44,3 +45,17 @@ logo = do
 -- | Layout wrapper.
 wrap :: Html -> Html
 wrap x = H.div ! aClass "wrap" $ x
+
+-- | Page footer.
+foot :: Html
+foot = H.div ! aClass "footer" $ p $
+  lnk "http://github.com/chrisdone/amelie" "Web site source code on Github"
+  //
+  lnk "http://book.realworldhaskell.org/" "Real World Haskell"
+  //
+  lnk "http://haskell.org/" "Haskell.org"
+  //
+  lnk "http://planet.haskell.org/" "Planet Haskell"
+
+    where lnk url t = href (url :: String) (t :: String)
+          left // right = do _ <- left; (" / " :: Html); right

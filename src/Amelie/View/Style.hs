@@ -22,6 +22,17 @@ style = renderCSS $ runCSS $ do
   highlighter
   form
   home
+  footer
+
+-- | Footer.
+footer :: CSS Rule
+footer = do
+  classRule "footer" $ do
+    textAlign "center"
+    subRule "a" $ do 
+      textDecoration "none"
+    subRule "a:hover" $ do
+      textDecoration "underline"
 
 -- | General layout styles.
 layout :: CSS Rule
