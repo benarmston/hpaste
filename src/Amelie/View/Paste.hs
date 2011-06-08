@@ -70,29 +70,29 @@ pasteFormlet PasteFormlet{..} =
                          pfLanguages
 
 -- | Render the page page.
-page :: Paste -> Html
-page p@Paste{..} =
+page :: [Channel] -> [Language] -> Paste -> Html
+page chans langs p@Paste{..} =
   layoutPage $ Page {
     pageTitle = pasteTitle
-  , pageBody = viewPaste p
+  , pageBody = viewPaste chans langs p
   , pageName = "paste"
   }
 
 -- | View a paste's details and content.
-viewPaste :: Paste -> Html
-viewPaste paste@Paste{..} = do
-  pasteDetails paste
+viewPaste :: [Channel] -> [Language] -> Paste -> Html
+viewPaste chans langs paste@Paste{..} = do
+  pasteDetails chans langs paste
   pasteContent paste
-  
+
 -- | List the details of the page in a dark section.
-pasteDetails :: Paste -> Html
-pasteDetails paste@Paste{..} =
+pasteDetails :: [Channel] -> [Language] -> Paste -> Html
+pasteDetails chans langs paste@Paste{..} =
   darkSection (fromStrict pasteTitle) $ do
       ul ! aClass "paste-specs" $ do
         detail "Paste" $ pasteLink paste $ "#" ++ show pasteId
         detail "Author" $ pasteAuthor
-        detail "Channel" $ maybe "-" show pasteChannel
-        detail "Language" $ maybe "-" show pasteLanguage
+        detail "Language" $ showLanguage langs pasteLanguage
+        detail "Channel" $ showChannel chans pasteChannel
         detail "Created" $ showDateTime pasteDate
         detail "Raw" $ pasteRawLink paste $ ("View raw link" :: Text)
       clear
@@ -100,6 +100,7 @@ pasteDetails paste@Paste{..} =
     where detail title content = do
             li $ do strong (title ++ ":"); toHtml content
 
+-- | Show the paste content with highlighting.
 pasteContent :: Paste -> Html
 pasteContent Paste{..} =
   lightNoTitleSection $ do

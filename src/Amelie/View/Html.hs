@@ -11,9 +11,15 @@ module Amelie.View.Html
   ,lightSection
   ,lightNoTitleSection
   ,href
-  ,clear)
+  ,clear
+  ,showLanguage
+  ,showChannel)
   where
 
+import           Amelie.Types
+
+import           Control.Arrow               ((&&&))
+import           Data.Maybe                  (fromMaybe)
 import           Data.Monoid.Operator        ((++))
 import           Data.Text.Lazy              (Text)
 import qualified Data.Text.Lazy              as T
@@ -57,3 +63,15 @@ href loc content = H.a ! A.href (toValue loc) $ toHtml content
 -- | A clear:both element.
 clear :: Html
 clear = H.div ! aClass "clear" $ return ()
+
+showLanguage :: [Language] -> Maybe LanguageId -> Html
+showLanguage languages lid =
+  toHtml $ fromMaybe "-" (lid >>= (`lookup` langs))
+
+    where langs = map (languageId &&& languageTitle) languages
+
+showChannel :: [Channel] -> Maybe ChannelId -> Html
+showChannel channels lid =
+  toHtml $ fromMaybe "-" (lid >>= (`lookup` langs))
+
+    where langs = map (channelId &&& channelName) channels

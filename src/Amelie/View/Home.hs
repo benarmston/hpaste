@@ -13,8 +13,6 @@ import           Amelie.View.Html
 import           Amelie.View.Layout
 import           Amelie.View.Paste           (pasteLink)
 
-import           Control.Arrow               ((&&&))
-import           Data.Maybe                  (fromMaybe)
 import           Data.Time.Show              (showDateTime)
 import           Prelude                     hiding ((++))
 import           Text.Blaze.Html5            as H hiding (map)
@@ -51,7 +49,5 @@ latest channels languages ps = do
                      td $ pasteLink paste pasteTitle
                      td $ toHtml pasteAuthor
                      td $ toHtml $ showDateTime $ pasteDate
-                     td $ toHtml $ fromMaybe "-" (pasteLanguage >>= (`lookup` langs))
-                     td $ toHtml $ fromMaybe "-" (pasteChannel >>= (`lookup` chans))
-          chans = map (channelId &&& channelName) channels
-          langs = map (languageId &&& languageTitle) languages
+                     td $ showLanguage languages pasteLanguage
+                     td $ showChannel channels pasteChannel
