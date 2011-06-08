@@ -7,14 +7,18 @@
 
 module Amelie.Types.Paste
        (Paste(..)
-       ,PasteSubmit(..))
+       ,PasteSubmit(..)
+       ,PasteFormlet(..))
        where
 
 import Amelie.Types.Newtypes
+import Amelie.Types.Language
+import Amelie.Types.Channel
 
 import Data.Text                               (Text,pack)
 import Data.Time                               (UTCTime,zonedTimeToUTC)
 import Database.PostgreSQL.Simple.QueryResults (QueryResults(..))
+import Snap.Types                              (Params)
 import Text.Blaze                              (ToHtml(..),toHtml)
 
 -- | A paste.
@@ -23,8 +27,8 @@ data Paste = Paste {
   ,pasteTitle    :: Text
   ,pasteDate     :: UTCTime
   ,pasteAuthor   :: Text
-  ,pasteLanguage :: Maybe Text
-  ,pasteChannel  :: Maybe Text
+  ,pasteLanguage :: Maybe LanguageId
+  ,pasteChannel  :: Maybe ChannelId
   ,pastePaste    :: Text
   ,pasteViews    :: Integer 
   ,pasteParent   :: Maybe PasteId
@@ -35,8 +39,8 @@ data PasteSubmit = PasteSubmit {
    pasteSubmitId       :: Maybe PasteId
   ,pasteSubmitTitle    :: Text
   ,pasteSubmitAuthor   :: Text
-  ,pasteSubmitLanguage :: Maybe Text
-  ,pasteSubmitChannel  :: Maybe Text
+  ,pasteSubmitLanguage :: Maybe LanguageId
+  ,pasteSubmitChannel  :: Maybe ChannelId
   ,pasteSubmitPaste    :: Text
 } deriving Show
 
@@ -57,3 +61,11 @@ instance QueryResults Paste where
     }
     where (pid,title,content,author,date,views,language,channel,parent) =
             convertResults field values
+
+data PasteFormlet = PasteFormlet {
+   pfSubmitted :: Bool
+ , pfErrors :: [Text]
+ , pfParams :: Params
+ , pfLanguages :: [Language]
+ , pfChannels :: [Channel]
+}

@@ -17,17 +17,19 @@ import           Amelie.View.Layout
 
 import           Control.Applicative              ((<$>),(<*>),pure)
 import           Control.Monad                    (when)
-import           Data.ByteString.UTF8
+import           Data.ByteString.UTF8             (toString)
 import qualified Data.Map                         as M
 import           Data.Monoid.Operator             ((++))
+import           Data.String                      (fromString)
 import           Data.Text                        (Text)
 import           Data.Text.Encoding               (encodeUtf8)
 import           Data.Text.Lazy                   (fromStrict)
 import           Data.Time.Show                   (showDateTime)
+import           Data.Traversable
 import           Prelude                          hiding ((++))
 import           Safe                             (readMay)
-import           Snap.Types                       (Params)
 import           Text.Blaze.Html5                 as H hiding (map)
+import qualified Text.Blaze.Html5.Attributes      as A
 import           Text.Blaze.Html5.Extra
 import           Text.Formlet
 import           Text.Highlighter.Formatters.Html (format)
@@ -35,27 +37,37 @@ import           Text.Highlighter.Lexer           (runLexer)
 import           Text.Highlighter.Lexers.Haskell  (lexer)
 
 -- | A formlet for paste submission / editing.
-pasteFormlet :: Params -> Bool -> [Text] -> (Formlet PasteSubmit,Html)
-pasteFormlet params submitted errors =
-  let form = postForm $ do
-        when submitted $
-          when (not (null errors)) $
+pasteFormlet :: PasteFormlet -> (Formlet PasteSubmit,Html)
+pasteFormlet PasteFormlet{..} =
+  let form = postForm ! A.action "/new" $ do
+        when pfSubmitted $
+          when (not (null pfErrors)) $
             H.div ! aClass "errors" $
-              mapM_ (p . toHtml) errors
-        formletHtml formlet params
+              mapM_ (p . toHtml) pfErrors
+        formletHtml formlet pfParams
         submitInput "submit" "Submit"
   in (formlet,form)
   
     where formlet =
-            PasteSubmit <$> pure pasteId
-                        <*> req (textInput "title" "Title")
-                        <*> req (textInput "author" "Author")
-                        <*> pure Nothing -- opt (dropInput "language" "Language")
-                        <*> pure Nothing -- opt (dropInput "channel" "Channel")
-                        <*> req (areaInput "paste" "Paste")
-          pasteId = M.lookup "paste_id" params >>=
+            PasteSubmit
+              <$> pure pasteId
+              <*> req (textInput "title" "Title")
+              <*> req (textInput "author" "Author")
+              <*> parse (traverse (fmap LanguageId . integer))
+                        (opt (dropInput languages "language" "Language"))
+              <*> parse (traverse (fmap ChannelId . integer))
+                        (opt (dropInput channels "channel" "Channel"))
+              <*> req (areaInput "paste" "Paste")
+
+          pasteId = M.lookup "paste_id" pfParams >>=
                     readMay . concat . map toString >>=
                     return . (fromIntegral :: Integer -> PasteId)
+          channels = map (\Channel{..} ->
+                           (fromString $ show channelId,channelName))
+                         pfChannels
+          languages = map (\Language{..} ->
+                           (fromString $ show languageId,languageTitle))
+                         pfLanguages
 
 -- | Render the page page.
 page :: Paste -> Html
@@ -80,6 +92,7 @@ pasteDetails paste@Paste{..} =
         detail "Paste" $ pasteLink paste $ "#" ++ show pasteId
         detail "Author" $ pasteAuthor
         detail "Channel" $ maybe "-" show pasteChannel
+        detail "Language" $ maybe "-" show pasteLanguage
         detail "Created" $ showDateTime pasteDate
         detail "Raw" $ pasteRawLink paste $ ("View raw link" :: Text)
       clear
@@ -93,7 +106,6 @@ pasteContent Paste{..} =
     case runLexer lexer (encodeUtf8 (pastePaste ++ "\n")) of
       Right tokens -> format True tokens
       _            -> pre $ toHtml pastePaste
-      
 
 -- | The href link to a paste.
 pasteLink :: ToHtml html => Paste -> html -> Html

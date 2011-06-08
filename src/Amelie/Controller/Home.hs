@@ -7,14 +7,22 @@ module Amelie.Controller.Home
   (handle)
   where
 
-import Amelie.Controller       (output)
+import Amelie.Controller       (outputText)
+import Amelie.Controller.Cache (cache)
 import Amelie.Controller.Paste (pasteForm)
 import Amelie.Model
-import Amelie.Model.Home       (getPastes)
+import Amelie.Model.Channel    (getChannels)
+import Amelie.Model.Language   (getLanguages)
+import Amelie.Model.Paste      (getLatestPastes)
+import Amelie.Types.Cache      as Key
 import Amelie.View.Home        (page)
 
 handle :: Controller ()
 handle = do
-  pastes <- model $ getPastes
-  form <- pasteForm
-  output $ page pastes form
+  html <- cache Key.Home $ do
+    pastes <- model $ getLatestPastes
+    chans <- model $ getChannels
+    langs <- model $ getLanguages
+    form <- pasteForm chans langs
+    return $ Just $ page chans langs pastes form
+  maybe (return ()) outputText html

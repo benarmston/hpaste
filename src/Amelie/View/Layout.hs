@@ -25,7 +25,7 @@ layoutPage Page{..} = do
       link ! A.rel "stylesheet" ! A.type_ "text/css" ! A.href "/css/amelie.css"
       js "jquery.js"
       js "amelie.js"
-      title $ toHtml $ pageTitle
+      title $ toHtml $ pageTitle ++ " :: hpaste — Haskell Pastebin"
     body ! A.id (toValue pageName) $
       wrap $ do
         logo

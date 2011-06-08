@@ -9,6 +9,7 @@ module Amelie.Controller
   where
 
 import Amelie.Types
+import Amelie.Types.Cache
 
 import Control.Monad.Reader       (runReaderT)
 import Data.Text.Lazy             (Text,toStrict)
@@ -18,10 +19,10 @@ import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)
 
 -- | Run a controller handler.
-runHandler :: Pool -> Controller () -> Snap ()
-runHandler pool ctrl = do
+runHandler :: Pool -> Cache -> Controller () -> Snap ()
+runHandler pool cache ctrl = do
   withPoolConnection pool $ \conn -> do
-    let state = ControllerState conn
+    let state = ControllerState conn cache
     runReaderT (runController ctrl) state 
 
 -- | Strictly renders HTML to Text before outputting it via Snap.

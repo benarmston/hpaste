@@ -11,6 +11,8 @@ module Amelie.Types.MVC
        ,ModelState(..))
        where
 
+import Amelie.Types.Cache
+
 import Control.Applicative        (Applicative,Alternative)
 import Control.Monad              (MonadPlus)
 import Control.Monad.Catch        (MonadCatchIO)
@@ -21,7 +23,8 @@ import Snap.Types                 (Snap,MonadSnap)
 
 -- | The state accessible to the controller (DB/session stuff).
 data ControllerState = ControllerState {
-    controllerStateConn :: Connection
+    controllerStateConn  :: Connection
+  , controllerStateCache :: Cache
   }
 
 -- | The controller monad.

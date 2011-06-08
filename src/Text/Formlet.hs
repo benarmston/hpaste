@@ -1,5 +1,6 @@
 {-# OPTIONS -Wall #-}
 {-# LANGUAGE OverloadedStrings, RecordWildCards, FlexibleInstances #-}
+{-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS -fno-warn-name-shadowing -fno-warn-orphans #-}
 
 -- | Mini formlets library.
@@ -10,10 +11,12 @@ module Text.Formlet
        ,req
        ,opt
        ,wrap
+       ,integer
        ,textInput
        ,dropInput
        ,areaInput
-       ,submitInput) where
+       ,submitInput
+       ,parse) where
 
 import           Control.Applicative
 import           Control.Monad.Error
@@ -27,6 +30,7 @@ import           Data.Text                   (Text)
 import qualified Data.Text                   as T
 import           Data.Text.Encoding
 import           Prelude                     hiding ((++))
+import           Safe                        (readMay)
 import           Snap.Types
 import           Text.Blaze.Html5            as H
 import qualified Text.Blaze.Html5.Attributes as A
@@ -102,6 +106,24 @@ opt formlet@Formlet{..} =
                 meh -> Just <$> meh
           }
 
+
+
+-- | Parse a form value.
+parse :: (a -> Either Text b) -> Formlet a -> Formlet b
+parse parser formlet@Formlet{..} =
+  formlet { formletValue = \inputs ->
+              case formletValue inputs of
+                Left e -> Left e
+                Right x -> case parser x of
+                             Right y -> Right y
+                             Left e -> Left [e ++ maybe "" (": "++) formletName]
+          }
+
+-- | Integer parser.
+integer :: Text -> Either Text Integer
+integer (readMay . T.unpack -> Just v) = Right v
+integer _ = Left "expected integer"
+
 -- | Wrap/transform formlet's HTML.
 wrap :: (Html -> Html) -> Formlet Text -> Formlet Text
 wrap f formlet@Formlet{..} = formlet { formletHtml = f . formletHtml }
@@ -125,13 +147,16 @@ areaInput name caption =
       textarea ! A.name (toValue name) $ toHtml $ fromMaybe "" value
 
 -- | Make a drop down input with a label.
-dropInput :: Text -> Text -> Formlet Text
-dropInput name caption =
+dropInput :: [(Text,Text)] -> Text -> Text -> Formlet Text
+dropInput values name caption =
   formlet name $ \value -> do
     p $ H.label $ do
       H.span $ toHtml $ caption ++ ": "
-      input ! A.name (toValue name)
-            ! A.value (toValue $ fromMaybe "" value)
+      select ! A.name (toValue name) $
+        forM_ values $ \(key,title) -> do
+          let selected | Just key == value = (! A.selected "selected")
+                      | otherwise         = id
+          selected $ option ! A.value (toValue key) $ toHtml title
 
 -- | Make a submit (captioned) button.
 submitInput :: Text -> Text -> Html

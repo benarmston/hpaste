@@ -170,6 +170,7 @@ lineNumbers :: CSS (Either Property Rule)
 lineNumbers = do
   subRule ".linenodiv" $ do
     margin "0 1em 0 0"
+    textAlign "right"
 
     subRule "a" $ do
       textDecoration "none"
@@ -178,6 +179,8 @@ lineNumbers = do
 -- | Home page styles.
 home :: CSS Rule
 home = do
-  rule "#home" $ do
-    subRule ".amelie-wrap" $ do
-      width "50em"
+  rule "#home" wrap
+  rule "#new" wrap
+  
+  where wrap = subRule ".amelie-wrap" $ do
+                 width "50em"

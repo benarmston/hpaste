@@ -11,20 +11,22 @@ module Amelie.Controller.Paste
 
 import Amelie.Types
 
-import Amelie.Model
-import Amelie.Model.Paste   (createOrEdit,getPasteById)
-import Amelie.View.Paste    (pasteFormlet,page)
 import Amelie.Controller
+import Amelie.Controller.Cache (cache,resetCache)
+import Amelie.Model
+import Amelie.Model.Paste      (createOrEdit,getPasteById)
+import Amelie.Types.Cache      as Key
+import Amelie.View.Paste       (pasteFormlet,page)
 
 import Control.Applicative
-import Data.ByteString.UTF8 (toString)
+import Data.ByteString.UTF8    (toString)
 import Data.Maybe
-import Data.Monoid.Operator ((++))
-import Data.String          (fromString)
-import Prelude              hiding ((++))
+import Data.Monoid.Operator    ((++))
+import Data.String             (fromString)
+import Prelude                 hiding ((++))
 import Safe
 import Snap.Types
-import Text.Blaze.Html5     as H hiding (output)
+import Text.Blaze.Html5        as H hiding (output)
 import Text.Formlet
 
 -- | Handle the paste page.
@@ -34,24 +36,36 @@ handle = do
   case pid of
     Nothing -> goHome
     Just (pid :: Integer) -> do
-      paste <- model $ getPasteById (fromIntegral pid)
-      maybe goHome (output . page) paste
+      html <- cache (Key.Paste pid) $ do
+        paste <- model $ getPasteById (fromIntegral pid)
+        return $ page <$> paste
+      case html of
+        Just html -> outputText html
+        Nothing   -> goHome
 
   where goHome = redirect "/"
 
 -- | Control paste editing / submission.
-pasteForm :: Controller Html
-pasteForm = do
+pasteForm :: [Channel] -> [Language] -> Controller Html
+pasteForm channels languages = do
   params <- getParams
   submitted <- isJust <$> getParam "submit"
-  let (getValue,_) = pasteFormlet params submitted []
+  let formlet = PasteFormlet {
+          pfSubmitted = submitted
+        , pfErrors    = []
+        , pfParams    = params
+        , pfChannels  = channels
+        , pfLanguages = languages
+        }
+      (getValue,_) = pasteFormlet formlet
       value = formletValue getValue params
       errors = either id (const []) value
-      (_,html) = pasteFormlet params submitted errors
+      (_,html) = pasteFormlet formlet { pfErrors = errors }
       val = either (const Nothing) Just $ value
   case val of
     Nothing    -> return ()
     Just paste -> do
+      resetCache Key.Home
       pid <- model $ createOrEdit paste
       maybe (return ()) redirectToPaste pid
   return html

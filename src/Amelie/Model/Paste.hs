@@ -44,11 +44,12 @@ createOrEdit paste@PasteSubmit{..} = do
 createPaste :: PasteSubmit -> Model (Maybe PasteId)
 createPaste PasteSubmit{..} =
   single ["INSERT INTO paste"
-         ,"(title,author,content)"
+         ,"(title,author,content,channel,language)"
          ,"VALUES"
-         ,"(?,?,?)"
+         ,"(?,?,?,?,?)"
          ,"returning id"]
-         (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste)
+         (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
+         ,pasteSubmitChannel,pasteSubmitLanguage)
 
 -- | Update an existing paste.
 updatePaste :: PasteId -> PasteSubmit -> Model ()
@@ -56,12 +57,14 @@ updatePaste pid PasteSubmit{..} = do
   _ <- exec (["UPDATE paste"
              ,"SET"]
              ++
-             map set (words "title author content")
+             map set (words "title author content language channel")
              ++
              ["WHERE id = ?"])
             (pasteSubmitTitle
             ,pasteSubmitAuthor
             ,pasteSubmitPaste
+            ,pasteSubmitLanguage
+            ,pasteSubmitChannel
             ,pid)
   return ()
   
