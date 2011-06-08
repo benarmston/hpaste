@@ -76,7 +76,7 @@ inputs =
       
     subRule "span" $ do
       float "left"
-      width "5em"
+      width "7em"
       display "block"
 
 -- | Section styles.
