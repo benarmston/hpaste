@@ -9,6 +9,7 @@ import Amelie.Controller.Cache    (newCache)
 import Amelie.Controller.Home     as Home
 import Amelie.Controller.New      as New
 import Amelie.Controller.Paste    as Paste
+import Amelie.Controller.Raw      as Raw
 import Amelie.Controller.Script   as Script
 import Amelie.Controller.Style    as Style
 import Amelie.Model.Config        (auth)
@@ -39,6 +40,7 @@ serve p cache = route routes where
            ,("/js/",serveDirectory "wwwroot/js")
            ,("",run Home.handle)
            ,("/:id",run Paste.handle)
+           ,("/raw/:id",run Raw.handle)
            ,("/new",run New.handle)
            ]
   run = runHandler p cache
