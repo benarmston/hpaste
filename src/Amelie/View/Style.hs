@@ -192,6 +192,8 @@ home :: CSS Rule
 home = do
   rule "#home" wrap
   rule "#new" wrap
+  classRule "wrap" $ do
+    width "500px"
   
   where wrap = subRule ".amelie-wrap" $ do
                  width "50em"
