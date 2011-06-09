@@ -14,5 +14,6 @@ import Amelie.Model
 -- | Get the languages.
 getLanguages :: Model [Language]
 getLanguages =
-  queryNoParams ["SELECT *"
-                ,"FROM language"]
+  queryNoParams ["SELECT id,name,title"
+                ,"FROM language"
+                ,"ORDER BY ordinal,title ASC"]
