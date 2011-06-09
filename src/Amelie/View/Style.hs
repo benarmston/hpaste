@@ -171,8 +171,8 @@ tokens = do
     tokenColor "n" "#343634"
     tokenColor "nf" "#222"
     -- This is a weird one.
-    subRule ".c1 + .t" $ do
-      display "none"
+    -- subRule ".c1 + .t" $ do
+    --   display "none"
 
   where token name props = subRule ("." ++ name) $ props
         tokenColor name col = token name $ color col
