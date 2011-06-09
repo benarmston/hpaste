@@ -12,6 +12,7 @@ module Amelie.View.Paste
   where
 
 import           Amelie.Types
+import           Amelie.View.Highlight            (highlightPaste)
 import           Amelie.View.Html
 import           Amelie.View.Layout
 
@@ -22,7 +23,6 @@ import qualified Data.Map                         as M
 import           Data.Monoid.Operator             ((++))
 import           Data.String                      (fromString)
 import           Data.Text                        (Text)
-import           Data.Text.Encoding               (encodeUtf8)
 import           Data.Text.Lazy                   (fromStrict)
 import           Data.Time.Show                   (showDateTime)
 import           Data.Traversable
@@ -32,9 +32,6 @@ import           Text.Blaze.Html5                 as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes      as A
 import           Text.Blaze.Html5.Extra
 import           Text.Formlet
-import           Text.Highlighter.Formatters.Html (format)
-import           Text.Highlighter.Lexer           (runLexer)
-import           Text.Highlighter.Lexers.Haskell  (lexer)
 
 -- | A formlet for paste submission / editing.
 pasteFormlet :: PasteFormlet -> (Formlet PasteSubmit,Html)
@@ -88,7 +85,7 @@ viewAnnotations chans langs pastes = do
 viewPaste :: [Channel] -> [Language] -> Paste -> Html
 viewPaste chans langs paste@Paste{..} = do
   pasteDetails chans langs paste
-  pasteContent paste
+  pasteContent langs paste
 
 -- | List the details of the page in a dark section.
 pasteDetails :: [Channel] -> [Language] -> Paste -> Html
@@ -107,12 +104,9 @@ pasteDetails chans langs paste@Paste{..} =
             li $ do strong (title ++ ":"); toHtml content
 
 -- | Show the paste content with highlighting.
-pasteContent :: Paste -> Html
-pasteContent Paste{..} =
-  lightNoTitleSection $ do
-    case runLexer lexer (encodeUtf8 (pastePaste ++ "\n")) of
-      Right tokens -> format True tokens
-      _            -> pre $ toHtml pastePaste
+pasteContent :: [Language] -> Paste -> Html
+pasteContent langs paste =
+  lightNoTitleSection $ highlightPaste langs paste
 
 -- | The href link to a paste.
 pasteLink :: ToHtml html => Paste -> html -> Html

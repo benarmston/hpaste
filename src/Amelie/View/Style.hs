@@ -165,6 +165,7 @@ tokens = do
     tokenColor "sc" "#366354"
     tokenColor "se" "#743838"
     tokenColor "kt" "#4F4371"
+    tokenColor "nv" "#4F4371"
     tokenColor "ow" "#333"
     tokenColor "o" "#3E394D"
     tokenColor "n" "#343634"
