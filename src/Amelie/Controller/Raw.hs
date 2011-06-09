@@ -10,13 +10,15 @@ module Amelie.Controller.Raw
 
 import Amelie.Types
 
+import Amelie.Controller
 import Amelie.Model
-import Amelie.Model.Paste      (getPasteById)
+import Amelie.Model.Paste   (getPasteById)
 
 import Control.Applicative
-import Data.ByteString.UTF8    (toString)
+import Data.ByteString.UTF8 (toString)
 import Data.Maybe
-import Prelude                 hiding ((++))
+import Data.Text.Lazy       (fromStrict)
+import Prelude              hiding ((++))
 import Safe
 import Snap.Types
 
@@ -29,6 +31,6 @@ handle = do
     Just (pid :: Integer) -> do
       modifyResponse $ setContentType "text/plain"
       paste <- model $ getPasteById (fromIntegral pid)
-      maybe goHome (writeText . pastePaste) paste
+      maybe goHome (outputText . fromStrict . pastePaste) paste
 
   where goHome = redirect "/"
