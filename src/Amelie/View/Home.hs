@@ -16,7 +16,6 @@ import           Amelie.View.Paste           (pasteLink)
 import           Data.Time.Show              (showDateTime)
 import           Prelude                     hiding ((++))
 import           Text.Blaze.Html5            as H hiding (map)
-import qualified Text.Blaze.Html5.Attributes as A
 
 -- | Render the home page.
 page :: [Channel] -> [Language] -> [Paste] -> Html -> Html

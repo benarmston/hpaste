@@ -13,6 +13,7 @@ module Amelie.View.Paste
 
 import           Amelie.Types
 import           Amelie.View.Highlight       (highlightPaste)
+import           Amelie.View.Hlint           (viewHints)
 import           Amelie.View.Html
 import           Amelie.View.Layout
 
@@ -25,6 +26,7 @@ import           Data.Text                   (Text)
 import           Data.Text.Lazy              (fromStrict)
 import           Data.Time.Show              (showDateTime)
 import           Data.Traversable
+import           Language.Haskell.HLint      (Suggestion)
 import           Prelude                     hiding ((++))
 import           Safe                        (readMay)
 import           Text.Blaze.Html5            as H hiding (map)
@@ -33,11 +35,12 @@ import           Text.Blaze.Html5.Extra
 import           Text.Formlet
 
 -- | Render the page page.
-page :: [Channel] -> [Language] -> Paste -> [Paste] -> Html
-page chans langs p@Paste{..} as =
+page :: [Channel] -> [Language] -> [Paste] -> [Suggestion] -> Paste -> Html
+page chans langs as hints p@Paste{..} =
   layoutPage $ Page {
     pageTitle = pasteTitle
   , pageBody = do viewPaste chans langs p
+                  viewHints hints
                   viewAnnotations chans langs as
   , pageName = "paste"
   }

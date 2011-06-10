@@ -13,6 +13,7 @@ import Amelie.Types
 
 import Amelie.Controller
 import Amelie.Controller.Cache (cache,resetCache)
+import Amelie.Controller.Hlint (getHints)
 import Amelie.Model
 import Amelie.Model.Channel    (getChannels)
 import Amelie.Model.Language   (getLanguages)
@@ -39,10 +40,14 @@ handle = do
   justOrGoHome pid $ \(pid :: Integer) -> do
       html <- cache (Key.Paste pid) $ do
         paste <- model $ getPasteById (fromIntegral pid)
-        pastes <- model $ getAnnotations (fromIntegral pid)
-        chans <- model $ getChannels
-        langs <- model $ getLanguages
-        return $ flip (page chans langs) pastes <$> paste
+        case paste of
+          Nothing -> return Nothing
+          Just paste -> do
+            hints <- getHints (pastePaste paste)
+            pastes <- model $ getAnnotations (fromIntegral pid)
+            chans <- model $ getChannels
+            langs <- model $ getLanguages
+            return $ Just $ page chans langs pastes hints paste
       justOrGoHome html outputText
 
 -- | Control paste editing / submission.

@@ -33,3 +33,4 @@ Executable amelie
                     ,safe          >= 0.3
                     ,hscolour      >= 1.17
                     ,HJScript      >= 0.5
+                    ,hlint         >= 1.8
