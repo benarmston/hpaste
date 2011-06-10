@@ -66,6 +66,7 @@ pasteSubmit pf@PasteFormlet{..} =
     <*> parse (traverse lookupChan)
               (opt (dropInput channels "channel" "Channel" ""))
     <*> req (areaInput "paste" "Paste")
+    <*> opt (wrap (H.div ! aClass "spam") (textInput "email" "Email"))
 
     where channels = options channelName channelName pfChannels
           languages = options languageName languageTitle pfLanguages

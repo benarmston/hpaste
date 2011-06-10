@@ -48,8 +48,6 @@ handle = do
         Just html -> outputText html
         Nothing   -> goHome
 
-  where goHome = redirect "/"
-
 -- | Control paste editing / submission.
 pasteForm :: [Channel] -> [Language] -> Controller Html
 pasteForm channels languages = do
@@ -68,7 +66,8 @@ pasteForm channels languages = do
       (_,html) = pasteFormlet formlet { pfErrors = errors }
       val = either (const Nothing) Just $ value
   case val of
-    Nothing    -> return ()
+    Nothing -> return ()
+    Just PasteSubmit{pasteSubmitSpamTrap=Just{}} -> goHome
     Just paste -> do
       resetCache Key.Home
       pid <- model $ createOrEdit paste

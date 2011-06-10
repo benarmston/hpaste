@@ -1,11 +1,13 @@
 {-# OPTIONS -Wall #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- | Controller routing/handling.
 
 module Amelie.Controller
   (runHandler
   ,output
-  ,outputText)
+  ,outputText
+  ,goHome)
   where
 
 import Amelie.Types
@@ -14,7 +16,7 @@ import Amelie.Types.Cache
 import Control.Monad.Reader       (runReaderT)
 import Data.Text.Lazy             (Text,toStrict)
 import Database.PostgreSQL.Simple (Pool,withPoolConnection)
-import Snap.Types                 (Snap,writeText)
+import Snap.Types                 (Snap,writeText,redirect)
 import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)
 
@@ -38,3 +40,7 @@ outputText :: Text -> Controller ()
 outputText text = do
   let !x = toStrict $ text
   writeText x
+
+-- | Generic redirect to home page.
+goHome :: Controller ()
+goHome = redirect "/"

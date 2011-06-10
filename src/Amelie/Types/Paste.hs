@@ -42,6 +42,7 @@ data PasteSubmit = PasteSubmit {
   ,pasteSubmitLanguage :: Maybe LanguageId
   ,pasteSubmitChannel  :: Maybe ChannelId
   ,pasteSubmitPaste    :: Text
+  ,pasteSubmitSpamTrap :: Maybe Text
 } deriving Show
 
 instance ToHtml Paste where

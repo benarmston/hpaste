@@ -32,5 +32,3 @@ handle = do
       modifyResponse $ setContentType "text/plain; charset=UTF-8"
       paste <- model $ getPasteById (fromIntegral pid)
       maybe goHome (outputText . fromStrict . pastePaste) paste
-
-  where goHome = redirect "/"

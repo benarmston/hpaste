@@ -54,6 +54,8 @@ layout = do
 form :: CSS Rule
 form = do
   inputs
+  classRule "spam" $ do
+    display "none"
   classRule "errors" $ do
     color "#743838"
     fontWeight "bold"
