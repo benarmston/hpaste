@@ -144,7 +144,7 @@ classRule = rule . (".amelie-" ++)
 -- | Styles for the highlighter.
 highlighter :: CSS Rule
 highlighter = do
-  rule ".highlighttable" $ do
+  classRule "code" $ do
     tokens
     lineNumbers
 
@@ -157,24 +157,16 @@ highlighter = do
 -- | Tokens colours and styles.
 tokens :: CSS (Either Property Rule)
 tokens = do
-  subRule ".highlight" $ do
-    tokenColor "cm" "#555"
-    tokenColor "c1" "#555"
-    tokenColor "kr" "#397460"
-    tokenColor "s" "#366354"
-    tokenColor "sc" "#366354"
-    tokenColor "se" "#743838"
-    tokenColor "kt" "#4F4371"
-    tokenColor "nv" "#4F4371"
-    tokenColor "ow" "#333"
-    tokenColor "o" "#3E394D"
-    tokenColor "n" "#343634"
-    tokenColor "nf" "#222"
-    -- This is a weird one.
-    -- subRule ".c1 + .t" $ do
-    --   display "none"
-
-  where token name props = subRule ("." ++ name) $ props
+  subRule "pre" $ do
+    marginTop "0"
+    tokenColor "comment" "#555"
+    tokenColor "keyword" "#397460"
+    tokenColor "str" "#366354"
+    tokenColor "conid" "#4F4371"
+    tokenColor "varop" "#333"
+    tokenColor "varid" "#333"
+    
+  where token name props = subRule (".hs-" ++ name) $ props
         tokenColor name col = token name $ color col
 
 -- | The line number part.

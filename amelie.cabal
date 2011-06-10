@@ -31,5 +31,5 @@ Executable amelie
                     ,time          >= 1.1
                     ,old-locale    >= 1.0
                     ,safe          >= 0.3
-                    ,highlighter   >= 0.2
+                    ,hscolour      >= 1.17
                     ,HJScript      >= 0.5

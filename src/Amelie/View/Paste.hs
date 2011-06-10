@@ -32,6 +32,16 @@ import qualified Text.Blaze.Html5.Attributes as A
 import           Text.Blaze.Html5.Extra
 import           Text.Formlet
 
+-- | Render the page page.
+page :: [Channel] -> [Language] -> Paste -> [Paste] -> Html
+page chans langs p@Paste{..} as =
+  layoutPage $ Page {
+    pageTitle = pasteTitle
+  , pageBody = do viewPaste chans langs p
+                  viewAnnotations chans langs as
+  , pageName = "paste"
+  }
+  
 -- | A formlet for paste submission / editing.
 pasteFormlet :: PasteFormlet -> (Formlet PasteSubmit,Html)
 pasteFormlet pf@PasteFormlet{..} =
@@ -69,16 +79,6 @@ getPasteId PasteFormlet{..} =
   M.lookup "paste_id" pfParams >>=
   readMay . concat . map toString >>=
   return . (fromIntegral :: Integer -> PasteId)
-
--- | Render the page page.
-page :: [Channel] -> [Language] -> Paste -> [Paste] -> Html
-page chans langs p@Paste{..} as =
-  layoutPage $ Page {
-    pageTitle = pasteTitle
-  , pageBody = do viewPaste chans langs p
-                  viewAnnotations chans langs as
-  , pageName = "paste"
-  }
 
 -- | View the paste's annotations.
 viewAnnotations :: [Channel] -> [Language] -> [Paste] -> Html

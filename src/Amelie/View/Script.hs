@@ -20,7 +20,7 @@ script = pack $ show $ snd $ evalHJScript $ do
   ready $ do
     each (setWidth (j ".amelie-wrap")
                    (mathMax (getWidth this' + 50) 500))
-         (j ".highlighttable:first")
+         (j ".amelie-code")
 
 -- | jQuery selector.
 j :: String -> JObject JQuery
