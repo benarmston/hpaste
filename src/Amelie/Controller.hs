@@ -7,7 +7,8 @@ module Amelie.Controller
   (runHandler
   ,output
   ,outputText
-  ,goHome)
+  ,goHome
+  ,justOrGoHome)
   where
 
 import Amelie.Types
@@ -44,3 +45,7 @@ outputText text = do
 -- | Generic redirect to home page.
 goHome :: Controller ()
 goHome = redirect "/"
+
+-- | Extract a Just value or go home.
+justOrGoHome :: Maybe a -> (a -> Controller ()) -> Controller ()
+justOrGoHome x m = maybe goHome m x

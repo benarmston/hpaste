@@ -21,6 +21,7 @@ import Amelie.Types.Cache      as Key
 import Amelie.View.Paste       (pasteFormlet,page)
 
 import Control.Applicative
+import Control.Monad           ((>=>))
 import Data.ByteString.UTF8    (toString)
 import Data.Maybe
 import Data.Monoid.Operator    ((++))
@@ -34,19 +35,15 @@ import Text.Formlet
 -- | Handle the paste page.
 handle :: Controller ()
 handle = do
-  pid <- (>>= readMay) . fmap (toString) <$> getParam "id"
-  case pid of
-    Nothing -> goHome
-    Just (pid :: Integer) -> do
+  pid <- (fmap toString >=> readMay) <$> getParam "id"
+  justOrGoHome pid $ \(pid :: Integer) -> do
       html <- cache (Key.Paste pid) $ do
         paste <- model $ getPasteById (fromIntegral pid)
         pastes <- model $ getAnnotations (fromIntegral pid)
         chans <- model $ getChannels
         langs <- model $ getLanguages
         return $ flip (page chans langs) pastes <$> paste
-      case html of
-        Just html -> outputText html
-        Nothing   -> goHome
+      justOrGoHome html outputText
 
 -- | Control paste editing / submission.
 pasteForm :: [Channel] -> [Language] -> Controller Html
