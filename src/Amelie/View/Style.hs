@@ -129,9 +129,9 @@ sections = do
       color "#2D2542"
    
   classRule "section-warn" $ do
-    background "#F1E9D7"
+    background "#FFF9C7"
     color "#915c31"
-    border "1px solid #D3C1B4"
+    border "1px solid #FFF178"
     subRule "pre" $ do
       margin "0"
     subRule "h2" $ do
