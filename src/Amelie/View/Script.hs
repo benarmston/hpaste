@@ -20,7 +20,7 @@ script = pack $ show $ snd $ evalHJScript $ do
   ready $ do
     each (setWidth (j ".amelie-wrap")
                    (mathMax (getWidth this' + 50) 500))
-         (j ".amelie-code")
+         (j ".amelie-code,.amelie-latest-pastes")
 
 -- | jQuery selector.
 j :: String -> JObject JQuery

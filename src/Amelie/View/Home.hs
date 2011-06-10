@@ -41,7 +41,7 @@ createNew = lightSection "Create new paste"
 latest :: [Channel] -> [Language] -> [Paste] -> Html
 latest channels languages ps = do
   darkSection "Latest pastes" $
-    table ! A.width "100%" $ do
+    table ! aClass "latest-pastes" $ do
       tr $ mapM_ (th . toHtml) $ words "Title Author When Language Channel"
       pastes ps
 
