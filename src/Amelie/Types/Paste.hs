@@ -8,7 +8,8 @@
 module Amelie.Types.Paste
        (Paste(..)
        ,PasteSubmit(..)
-       ,PasteFormlet(..))
+       ,PasteFormlet(..)
+       ,PastePage(..))
        where
 
 import Amelie.Types.Newtypes
@@ -18,6 +19,7 @@ import Amelie.Types.Channel
 import Data.Text                               (Text,pack)
 import Data.Time                               (UTCTime,zonedTimeToUTC)
 import Database.PostgreSQL.Simple.QueryResults (QueryResults(..))
+import Language.Haskell.HLint                  (Suggestion)
 import Snap.Types                              (Params)
 import Text.Blaze                              (ToHtml(..),toHtml)
 
@@ -69,4 +71,12 @@ data PasteFormlet = PasteFormlet {
  , pfParams :: Params
  , pfLanguages :: [Language]
  , pfChannels :: [Channel]
+}
+
+data PastePage = PastePage {
+    ppPaste :: Paste
+  , ppChans :: [Channel]
+  , ppLangs :: [Language]
+  , ppHints :: [Suggestion]
+  , ppAnnotations :: [Paste]
 }

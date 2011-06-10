@@ -47,7 +47,13 @@ handle = do
             pastes <- model $ getAnnotations (fromIntegral pid)
             chans <- model $ getChannels
             langs <- model $ getLanguages
-            return $ Just $ page chans langs pastes hints paste
+            return $ Just $ page PastePage {
+              ppChans       = chans
+            , ppLangs       = langs
+            , ppAnnotations = pastes
+            , ppHints       = hints
+            , ppPaste       = paste
+            }
       justOrGoHome html outputText
 
 -- | Control paste editing / submission.

@@ -26,7 +26,6 @@ import           Data.Text                   (Text)
 import           Data.Text.Lazy              (fromStrict)
 import           Data.Time.Show              (showDateTime)
 import           Data.Traversable
-import           Language.Haskell.HLint      (Suggestion)
 import           Prelude                     hiding ((++))
 import           Safe                        (readMay)
 import           Text.Blaze.Html5            as H hiding (map)
@@ -35,13 +34,13 @@ import           Text.Blaze.Html5.Extra
 import           Text.Formlet
 
 -- | Render the page page.
-page :: [Channel] -> [Language] -> [Paste] -> [Suggestion] -> Paste -> Html
-page chans langs as hints p@Paste{..} =
+page :: PastePage -> Html
+page PastePage {ppPaste=p@Paste{..},..} =
   layoutPage $ Page {
     pageTitle = pasteTitle
-  , pageBody = do viewPaste chans langs p
-                  viewHints hints
-                  viewAnnotations chans langs as
+  , pageBody = do viewPaste ppChans ppLangs p
+                  viewHints ppHints
+                  viewAnnotations ppChans ppLangs ppAnnotations
   , pageName = "paste"
   }
   
