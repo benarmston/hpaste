@@ -12,61 +12,63 @@ module Amelie.View.Paste
   where
 
 import           Amelie.Types
-import           Amelie.View.Highlight            (highlightPaste)
+import           Amelie.View.Highlight       (highlightPaste)
 import           Amelie.View.Html
 import           Amelie.View.Layout
 
-import           Control.Applicative              ((<$>),(<*>),pure)
-import           Control.Monad                    (when)
-import           Data.ByteString.UTF8             (toString)
-import qualified Data.Map                         as M
-import           Data.Monoid.Operator             ((++))
-import           Data.String                      (fromString)
-import           Data.Text                        (Text)
-import           Data.Text.Lazy                   (fromStrict)
-import           Data.Time.Show                   (showDateTime)
+import           Control.Applicative         ((<$>),(<*>),pure)
+import           Control.Monad               (when)
+import           Data.ByteString.UTF8        (toString)
+import qualified Data.Map                    as M
+import           Data.Monoid.Operator        ((++))
+import           Data.Text                   (Text)
+import           Data.Text.Lazy              (fromStrict)
+import           Data.Time.Show              (showDateTime)
 import           Data.Traversable
-import           Prelude                          hiding ((++))
-import           Safe                             (readMay)
-import           Text.Blaze.Html5                 as H hiding (map)
-import qualified Text.Blaze.Html5.Attributes      as A
+import           Prelude                     hiding ((++))
+import           Safe                        (readMay)
+import           Text.Blaze.Html5            as H hiding (map)
+import qualified Text.Blaze.Html5.Attributes as A
 import           Text.Blaze.Html5.Extra
 import           Text.Formlet
 
 -- | A formlet for paste submission / editing.
 pasteFormlet :: PasteFormlet -> (Formlet PasteSubmit,Html)
-pasteFormlet PasteFormlet{..} =
+pasteFormlet pf@PasteFormlet{..} =
   let form = postForm ! A.action "/new" $ do
         when pfSubmitted $
           when (not (null pfErrors)) $
             H.div ! aClass "errors" $
               mapM_ (p . toHtml) pfErrors
-        formletHtml formlet pfParams
+        formletHtml (pasteSubmit pf) pfParams
         submitInput "submit" "Submit"
-  in (formlet,form)
-  
-    where formlet =
-            PasteSubmit
-              <$> pure pasteId
-              <*> req (textInput "title" "Title")
-              <*> req (textInput "author" "Author")
-              <*> parse (traverse (fmap LanguageId . integer))
-                        (opt (dropInput languages "language" "Language"))
-              <*> parse (traverse (fmap ChannelId . integer))
-                        (opt (dropInput channels "channel" "Channel"))
-              <*> req (areaInput "paste" "Paste")
+  in (pasteSubmit pf,form)
 
-          pasteId = M.lookup "paste_id" pfParams >>=
-                    readMay . concat . map toString >>=
-                    return . (fromIntegral :: Integer -> PasteId)
-          channels = ("","") :
-                     map (\Channel{..} ->
-                           (fromString $ show channelId,channelName))
-                         pfChannels
-          languages = ("","") :
-                     map (\Language{..} ->
-                           (fromString $ show languageId,languageTitle))
-                         pfLanguages
+-- | The paste submitting formlet itself.
+pasteSubmit :: PasteFormlet -> Formlet PasteSubmit
+pasteSubmit pf@PasteFormlet{..} =
+  PasteSubmit
+    <$> pure (getPasteId pf)
+    <*> req (textInput "title" "Title")
+    <*> req (textInput "author" "Author")
+    <*> parse (traverse lookupLang)
+              (opt (dropInput languages "language" "Language"))
+    <*> parse (traverse lookupChan)
+              (opt (dropInput channels "channel" "Channel"))
+    <*> req (areaInput "paste" "Paste")
+
+    where channels = options channelName channelName pfChannels
+          languages = options languageName languageTitle pfLanguages
+          
+          lookupLang slug = findOption ((==slug).languageName) pfLanguages languageId
+          lookupChan slug = findOption ((==slug).channelName) pfChannels channelId
+
+-- | Get the paste id.
+getPasteId :: PasteFormlet -> Maybe PasteId
+getPasteId PasteFormlet{..} =
+  M.lookup "paste_id" pfParams >>=
+  readMay . concat . map toString >>=
+  return . (fromIntegral :: Integer -> PasteId)
 
 -- | Render the page page.
 page :: [Channel] -> [Language] -> Paste -> [Paste] -> Html

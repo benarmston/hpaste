@@ -16,13 +16,16 @@ module Text.Formlet
        ,dropInput
        ,areaInput
        ,submitInput
-       ,parse) where
+       ,parse
+       ,options
+       ,findOption) where
 
 import           Control.Applicative
 import           Control.Monad.Error
 import           Control.Monad.Reader
 import           Control.Monad.Trans.Error   (ErrorList(..))
 import           Control.Monad.Writer
+import           Data.List                   (find)
 import qualified Data.Map                    as M
 import           Data.Maybe
 import           Data.Monoid.Operator
@@ -32,7 +35,7 @@ import           Data.Text.Encoding
 import           Prelude                     hiding ((++))
 import           Safe                        (readMay)
 import           Snap.Types
-import           Text.Blaze.Html5            as H
+import           Text.Blaze.Html5            as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
 -- | A simple formlet data type, fails on first error.
@@ -164,3 +167,14 @@ submitInput name caption = p $ do
   p $ H.input ! A.type_ "submit"
               ! A.name (toValue name)
               ! A.value (toValue caption)
+
+-- | Make a list of options for use with the option formlet.
+options :: (o -> Text) -> (o -> Text) -> [o] -> [(Text,Text)]
+options slug caption os = ("","") : map (\o -> (slug o,caption o)) os
+
+-- | Lookup a real internal id from a slug.
+findOption :: (o -> Bool) -> [o] -> (o -> internalid) -> Either Text internalid
+findOption pred os field =
+  case find pred os of
+    Nothing -> Left ""
+    Just x -> Right (field x)
