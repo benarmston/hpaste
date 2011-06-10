@@ -117,6 +117,25 @@ sections = do
 
     subRule "h2" $ do
       color "#2D2542"
+   
+  classRule "section-error" $ do
+    background "#FFDFDF"
+    color "#5b4444"
+    border "1px solid #EFB3B3"
+
+    subRule "pre" $ do
+      margin "0"
+    subRule "h2" $ do
+      color "#2D2542"
+   
+  classRule "section-warn" $ do
+    background "#F1E9D7"
+    color "#915c31"
+    border "1px solid #D3C1B4"
+    subRule "pre" $ do
+      margin "0"
+    subRule "h2" $ do
+      color "#2D2542"
 
 -- | Paste view styles.
 paste :: CSS Rule

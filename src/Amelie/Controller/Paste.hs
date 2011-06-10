@@ -43,7 +43,7 @@ handle = do
         case paste of
           Nothing -> return Nothing
           Just paste -> do
-            hints <- getHints (pastePaste paste)
+            hints <- getHints paste
             pastes <- model $ getAnnotations (fromIntegral pid)
             chans <- model $ getChannels
             langs <- model $ getLanguages

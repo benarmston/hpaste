@@ -10,6 +10,8 @@ module Amelie.View.Html
   ,darkSection
   ,lightSection
   ,lightNoTitleSection
+  ,warnNoTitleSection
+  ,errorNoTitleSection
   ,href
   ,clear
   ,showLanguage
@@ -35,6 +37,18 @@ aClass name = A.class_ ("amelie-" ++ name)
 aClasses :: [Text] -> Attribute
 aClasses names = A.class_ $
   toValue $ T.intercalate " " $ map ("amelie-" ++) names
+
+-- | A warning section.
+warnNoTitleSection :: Html -> Html
+warnNoTitleSection inner =
+  H.div ! aClasses ["section","section-warn"] $ do
+    inner
+
+-- | An error section.
+errorNoTitleSection :: Html -> Html
+errorNoTitleSection inner =
+  H.div ! aClasses ["section","section-error"] $ do
+    inner
 
 -- | A dark section.
 darkSection :: Text -> Html -> Html

@@ -34,3 +34,5 @@ Executable amelie
                     ,hscolour      >= 1.17
                     ,HJScript      >= 0.5
                     ,hlint         >= 1.8
+                    ,filepath      >= 1.1
+                    ,directory     >= 1.0
