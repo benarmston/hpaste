@@ -150,15 +150,19 @@ areaInput name caption =
       textarea ! A.name (toValue name) $ toHtml $ fromMaybe "" value
 
 -- | Make a drop down input with a label.
-dropInput :: [(Text,Text)] -> Text -> Text -> Formlet Text
-dropInput values name caption =
+dropInput :: [(Text,Text)] -> Text -> Text -> Text -> Formlet Text
+dropInput values name caption def =
   formlet name $ \value -> do
     p $ H.label $ do
       H.span $ toHtml $ caption ++ ": "
       select ! A.name (toValue name) $
         forM_ values $ \(key,title) -> do
-          let selected | Just key == value = (! A.selected "selected")
-                      | otherwise         = id
+          let nonSelected = all ((/=value) . Just . fst) values
+              defaulting = nonSelected && def == key
+              selected
+                | Just key == value = (! A.selected "selected")
+                | defaulting        = (! A.selected "selected")
+                | otherwise         = id
           selected $ option ! A.value (toValue key) $ toHtml title
 
 -- | Make a submit (captioned) button.

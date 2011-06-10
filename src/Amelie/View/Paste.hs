@@ -52,9 +52,9 @@ pasteSubmit pf@PasteFormlet{..} =
     <*> req (textInput "title" "Title")
     <*> req (textInput "author" "Author")
     <*> parse (traverse lookupLang)
-              (opt (dropInput languages "language" "Language"))
+              (opt (dropInput languages "language" "Language" "haskell"))
     <*> parse (traverse lookupChan)
-              (opt (dropInput channels "channel" "Channel"))
+              (opt (dropInput channels "channel" "Channel" ""))
     <*> req (areaInput "paste" "Paste")
 
     where channels = options channelName channelName pfChannels
