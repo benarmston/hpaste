@@ -59,10 +59,12 @@ pasteFormlet PasteFormlet{..} =
           pasteId = M.lookup "paste_id" pfParams >>=
                     readMay . concat . map toString >>=
                     return . (fromIntegral :: Integer -> PasteId)
-          channels = map (\Channel{..} ->
+          channels = ("","") :
+                     map (\Channel{..} ->
                            (fromString $ show channelId,channelName))
                          pfChannels
-          languages = map (\Language{..} ->
+          languages = ("","") :
+                     map (\Language{..} ->
                            (fromString $ show languageId,languageTitle))
                          pfLanguages
 
