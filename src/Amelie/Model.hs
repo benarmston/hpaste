@@ -8,6 +8,7 @@ module Amelie.Model
   (model
   ,query
   ,single
+  ,singleNoParams
   ,queryNoParams
   ,exec
   ,module Amelie.Types
@@ -39,6 +40,13 @@ query q ps = do
 single :: (QueryParams ps,QueryResults (Only r)) => [String] -> ps -> Model (Maybe r)
 single q ps = do
   rows <- query q ps
+  case rows of
+    [(Only r)] -> return (Just r)
+    _          -> return Nothing
+
+singleNoParams :: (QueryResults (Only r)) => [String] -> Model (Maybe r)
+singleNoParams q = do
+  rows <- queryNoParams q
   case rows of
     [(Only r)] -> return (Just r)
     _          -> return Nothing

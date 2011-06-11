@@ -8,14 +8,23 @@ module Amelie.Model.Paste
   (getLatestPastes
   ,getPasteById
   ,createOrEdit
-  ,getAnnotations)
+  ,getAnnotations
+  ,getSomePastes
+  ,countPublicPastes)
   where
 
 import Amelie.Types
 import Amelie.Model
 
 import Control.Applicative ((<$>))
-import Data.Maybe          (listToMaybe)
+import Data.Maybe          (fromMaybe,listToMaybe)
+
+-- | Count public pastes.
+countPublicPastes :: Model Integer
+countPublicPastes = do
+  rows <- singleNoParams ["SELECT COUNT(*)"
+                         ,"FROM public_toplevel_paste"]
+  return $ fromMaybe 0 rows
 
 -- | Get the latest pastes.
 getLatestPastes :: Model [Paste]
@@ -24,6 +33,15 @@ getLatestPastes =
                 ,"FROM public_toplevel_paste"
                 ,"ORDER BY id DESC"
                 ,"LIMIT 20"]
+
+-- | Get the latest pastes.
+getSomePastes :: Pagination -> Model [Paste]
+getSomePastes Pagination{..} =
+  queryNoParams ["SELECT *"
+                ,"FROM public_toplevel_paste"
+                ,"ORDER BY id DESC"
+                ,"OFFSET " ++ show (max 0 (pnPage - 1) * pnLimit)
+                ,"LIMIT " ++ show pnLimit]
 
 -- | Get a paste by its id.
 getPasteById :: PasteId -> Model (Maybe Paste)

@@ -8,16 +8,22 @@ module Amelie.Controller
   ,output
   ,outputText
   ,goHome
-  ,justOrGoHome)
+  ,justOrGoHome
+  ,getInteger
+  ,getPagination)
   where
 
 import Amelie.Types
 import Amelie.Types.Cache
 
+import Control.Applicative
 import Control.Monad.Reader       (runReaderT)
+import Data.ByteString            (ByteString)
+import Data.ByteString.UTF8       (toString)
 import Data.Text.Lazy             (Text,toStrict)
 import Database.PostgreSQL.Simple (Pool,withPoolConnection)
-import Snap.Types                 (Snap,writeText,redirect)
+import Safe                       (readMay)
+import Snap.Types                 (Snap,writeText,redirect,getParam)
 import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)
 
@@ -49,3 +55,21 @@ goHome = redirect "/"
 -- | Extract a Just value or go home.
 justOrGoHome :: Maybe a -> (a -> Controller ()) -> Controller ()
 justOrGoHome x m = maybe goHome m x
+
+-- | Get integer parmater.
+getInteger :: ByteString -> Integer -> Controller Integer
+getInteger name def = do
+  pid <- (>>= readMay . toString) <$> getParam name
+  maybe (return def) return pid
+
+-- | Get pagination data.
+getPagination :: Controller Pagination
+getPagination = do
+  p <- getInteger "page" 1
+  limit <- getInteger "limit" 35
+  return Pagination { pnPage = max 1 p
+                    , pnLimit = max 1 (min 100 limit)
+                    , pnRoot = "/"
+                    , pnResults = 0
+                    , pnTotal = 0
+                    }

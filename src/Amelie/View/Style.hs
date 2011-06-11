@@ -22,6 +22,7 @@ style = renderCSS $ runCSS $ do
   highlighter
   form
   home
+  browse
   footer
 
 -- | Footer.
@@ -205,6 +206,19 @@ lineNumbers = do
 home :: CSS Rule
 home = do
   rule "#new" wrap
+  classRule "browse-link" $ do
+    margin "1em 0 0 0"
   
   where wrap = subRule ".amelie-wrap" $ do
                  width "50em"
+
+-- | Browse page styles.
+browse :: CSS Rule
+browse = do
+  classRule "pagination" $ do
+    textAlign "center"
+    margin "1em"
+
+    subRule ".amelie-inner" $ do
+      margin "auto"
+      width "15em"
