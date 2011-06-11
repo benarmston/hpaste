@@ -13,11 +13,10 @@ import Amelie.Types
 
 import Amelie.Controller
 import Amelie.Controller.Cache (cache,resetCache)
-import Amelie.Controller.Hlint (getHints)
 import Amelie.Model
 import Amelie.Model.Channel    (getChannels)
 import Amelie.Model.Language   (getLanguages)
-import Amelie.Model.Paste      (createOrEdit,getPasteById,getAnnotations)
+import Amelie.Model.Paste
 import Amelie.Types.Cache      as Key
 import Amelie.View.Paste       (pasteFormlet,page)
 
@@ -43,7 +42,7 @@ handle = do
         case paste of
           Nothing -> return Nothing
           Just paste -> do
-            hints <- getHints paste
+            hints <- model $ getHints (pasteId paste)
             pastes <- model $ getAnnotations (fromIntegral pid)
             chans <- model $ getChannels
             langs <- model $ getLanguages

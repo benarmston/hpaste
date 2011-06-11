@@ -1,6 +1,3 @@
-create view public_paste as select id, title, content, author,
-created, views, language, channel, annotation_of from paste where
-public;
-
-create view public_toplevel_paste as select * from public_paste where
-annotation_of is null;
+CREATE TABLE hint (id serial primary key, paste integer references
+paste(id) on delete cascade on update cascade, type text not null,
+content text not null);

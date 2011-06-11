@@ -48,4 +48,4 @@ data ModelState = ModelState {
 -- | The model monad (limited access to IO, only DB access).
 newtype Model a = Model {
     runModel :: ReaderT ModelState IO a
-  } deriving (Monad,Functor,Applicative,MonadReader ModelState)
+  } deriving (Monad,Functor,Applicative,MonadReader ModelState,MonadIO)

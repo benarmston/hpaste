@@ -1,6 +1,8 @@
 {-# OPTIONS -Wall #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns #-}
 
 -- | Paste model.
 
@@ -10,14 +12,21 @@ module Amelie.Model.Paste
   ,createOrEdit
   ,getAnnotations
   ,getSomePastes
-  ,countPublicPastes)
+  ,countPublicPastes
+  ,getHints)
   where
 
 import Amelie.Types
 import Amelie.Model
 
-import Control.Applicative ((<$>))
-import Data.Maybe          (fromMaybe,listToMaybe)
+import Control.Applicative    ((<$>))
+import Control.Monad
+import Control.Monad.IO
+import Data.Maybe             (fromMaybe,listToMaybe)
+import Data.Text.IO           as T (writeFile)
+import Language.Haskell.HLint
+import System.Directory
+import System.FilePath
 
 -- | Count public pastes.
 countPublicPastes :: Model Integer
@@ -69,14 +78,44 @@ createOrEdit paste@PasteSubmit{..} = do
 
 -- | Create a new paste.
 createPaste :: PasteSubmit -> Model (Maybe PasteId)
-createPaste PasteSubmit{..} =
-  single ["INSERT INTO paste"
-         ,"(title,author,content,channel,language)"
-         ,"VALUES"
-         ,"(?,?,?,?,?)"
-         ,"returning id"]
-         (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
-         ,pasteSubmitChannel,pasteSubmitLanguage)
+createPaste ps@PasteSubmit{..} = do
+  pid <- single ["INSERT INTO paste"
+                ,"(title,author,content,channel,language)"
+                ,"VALUES"
+                ,"(?,?,?,?,?)"
+                ,"returning id"]
+                (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
+                ,pasteSubmitChannel,pasteSubmitLanguage)
+  case pid of
+    Nothing  -> return ()
+    Just p -> do
+      hints <- generateHints ps p
+      forM_ hints $ \hint ->
+        exec ["INSERT INTO hint"
+             ,"(paste,type,content)"
+             ,"VALUES"
+             ,"(?,?,?)"]
+             (pid
+             ,suggestionSeverity hint
+             ,show hint)
+  return pid
+
+-- | Get hints for a Haskell paste from hlint.
+generateHints :: PasteSubmit -> PasteId -> Model [Suggestion]
+generateHints  PasteSubmit{..} (fromIntegral -> pid :: Integer) = io $ do
+  tmpdir <- getTemporaryDirectory
+  let tmp = tmpdir </> show pid ++ ".hs"
+  exists <- doesFileExist tmp
+  unless exists $ T.writeFile tmp $ pasteSubmitPaste
+  hints <- hlint [tmp,"--quiet","--ignore=Parse error"]
+  return hints
+
+getHints :: PasteId -> Model [Hint]
+getHints pid =
+  query ["SELECT type,content"
+        ,"FROM hint"
+        ,"WHERE paste = ?"]
+        (Only pid)
 
 -- | Update an existing paste.
 updatePaste :: PasteId -> PasteSubmit -> Model ()

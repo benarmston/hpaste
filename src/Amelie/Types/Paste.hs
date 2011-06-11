@@ -1,4 +1,4 @@
-{-# OPTIONS -Wall #-}
+{-# OPTIONS -Wall -fno-warn-orphans #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -9,17 +9,22 @@ module Amelie.Types.Paste
        (Paste(..)
        ,PasteSubmit(..)
        ,PasteFormlet(..)
-       ,PastePage(..))
+       ,PastePage(..)
+       ,Hint(..))
        where
 
 import Amelie.Types.Newtypes
 import Amelie.Types.Language
 import Amelie.Types.Channel
 
+import Blaze.ByteString.Builder                (toByteString)
+import Blaze.ByteString.Builder.Char.Utf8      as Utf8 (fromString)
 import Data.Text                               (Text,pack)
 import Data.Time                               (UTCTime,zonedTimeToUTC)
+import Database.PostgreSQL.Simple.Param        (Param(..),Action(..))
 import Database.PostgreSQL.Simple.QueryResults (QueryResults(..))
-import Language.Haskell.HLint                  (Suggestion)
+import Database.PostgreSQL.Simple.Result       (Result(..))
+import Language.Haskell.HLint                  (Severity)
 import Snap.Types                              (Params)
 import Text.Blaze                              (ToHtml(..),toHtml)
 
@@ -77,6 +82,27 @@ data PastePage = PastePage {
     ppPaste :: Paste
   , ppChans :: [Channel]
   , ppLangs :: [Language]
-  , ppHints :: [Suggestion]
+  , ppHints :: [Hint]
   , ppAnnotations :: [Paste]
 }
+
+instance Param Severity where
+  render = Escape . toByteString . Utf8.fromString . show
+  {-# INLINE render #-}
+
+instance Result Severity where
+  convert f = read . convert f
+  {-# INLINE convert #-}
+
+-- | A hlint (or like) suggestion.
+data Hint = Hint {
+   hintType    :: Severity
+ , hintContent :: String
+}
+
+instance QueryResults Hint where
+  convertResults field values = Hint {
+      hintType = severity
+    , hintContent = content
+    }
+    where (severity,content) = convertResults field values
