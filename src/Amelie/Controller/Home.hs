@@ -23,6 +23,6 @@ handle = do
     pastes <- model $ getLatestPastes
     chans <- model $ getChannels
     langs <- model $ getLanguages
-    form <- pasteForm chans langs
+    form <- pasteForm chans langs Nothing
     return $ Just $ page chans langs pastes form
   maybe (return ()) outputText html

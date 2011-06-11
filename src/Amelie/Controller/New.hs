@@ -14,9 +14,14 @@ import Amelie.Model.Channel    (getChannels)
 import Amelie.Model.Language   (getLanguages)
 import Amelie.View.New         (page)
 
+import Control.Applicative
+import Data.Text.Encoding      (decodeUtf8)
+import Snap.Types
+
 handle :: Controller ()
 handle = do
   chans <- model $ getChannels
   langs <- model $ getLanguages
-  form <- pasteForm chans langs
+  defChan <- fmap decodeUtf8 <$> getParam "channel"
+  form <- pasteForm chans langs defChan
   output $ page form

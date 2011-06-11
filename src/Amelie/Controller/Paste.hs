@@ -26,6 +26,7 @@ import Data.ByteString.UTF8    (toString)
 import Data.Maybe
 import Data.Monoid.Operator    ((++))
 import Data.String             (fromString)
+import Data.Text               (Text)
 import Prelude                 hiding ((++))
 import Safe
 import Snap.Types
@@ -56,8 +57,8 @@ handle = do
       justOrGoHome html outputText
 
 -- | Control paste editing / submission.
-pasteForm :: [Channel] -> [Language] -> Controller Html
-pasteForm channels languages = do
+pasteForm :: [Channel] -> [Language] -> Maybe Text -> Controller Html
+pasteForm channels languages defChan = do
   params <- getParams
   submitted <- isJust <$> getParam "submit"
   let formlet = PasteFormlet {
@@ -66,6 +67,7 @@ pasteForm channels languages = do
         , pfParams    = params
         , pfChannels  = channels
         , pfLanguages = languages
+        , pfDefChan   = defChan
         }
       (getValue,_) = pasteFormlet formlet
       value = formletValue getValue params

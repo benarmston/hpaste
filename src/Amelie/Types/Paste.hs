@@ -76,6 +76,7 @@ data PasteFormlet = PasteFormlet {
  , pfParams :: Params
  , pfLanguages :: [Language]
  , pfChannels :: [Channel]
+ , pfDefChan :: Maybe Text
 }
 
 data PastePage = PastePage {

@@ -43,6 +43,7 @@ serve p cache = route routes where
            ,("/:id",run Paste.handle)
            ,("/raw/:id",run Raw.handle)
            ,("/new",run New.handle)
+           ,("/new/:channel",run New.handle)
            ,("/browse/page/:page/offset/:offset",run Browse.handle)
            ,("/browse/page/:page",run Browse.handle)
            ,("/browse",run Browse.handle)

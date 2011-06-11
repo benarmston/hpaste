@@ -18,11 +18,14 @@ import           Amelie.View.Html
 import           Amelie.View.Layout
 
 import           Control.Applicative         ((<$>),(<*>),pure)
+import           Control.Arrow               ((&&&))
 import           Control.Monad               (when)
 import           Data.ByteString.UTF8        (toString)
+import           Data.List                   (find)
 import qualified Data.Map                    as M
 import           Data.Monoid.Operator        ((++))
 import           Data.Text                   (Text)
+import qualified Data.Text                   as T
 import           Data.Text.Lazy              (fromStrict)
 import           Data.Time.Show              (showDateTime)
 import           Data.Traversable
@@ -64,9 +67,9 @@ pasteSubmit pf@PasteFormlet{..} =
     <*> req (textInput "title" "Title")
     <*> req (textInput "author" "Author")
     <*> parse (traverse lookupLang)
-              (opt (dropInput languages "language" "Language" "haskell"))
+              (opt (dropInput languages "language" "Language" (snd defChan)))
     <*> parse (traverse lookupChan)
-              (opt (dropInput channels "channel" "Channel" ""))
+              (opt (dropInput channels "channel" "Channel" (fst defChan)))
     <*> req (areaInput "paste" "Paste")
     <*> opt (wrap (H.div ! aClass "spam") (textInput "email" "Email"))
 
@@ -75,6 +78,12 @@ pasteSubmit pf@PasteFormlet{..} =
           
           lookupLang slug = findOption ((==slug).languageName) pfLanguages languageId
           lookupChan slug = findOption ((==slug).channelName) pfChannels channelId
+          
+          defChan = maybe ("","haskell")
+                          (channelName &&& trim.channelName)
+                          (pfDefChan >>= findChan)
+          findChan name = find ((==name).trim.channelName) pfChannels
+          trim = T.dropWhile (=='#')
 
 -- | Get the paste id.
 getPasteId :: PasteFormlet -> Maybe PasteId
