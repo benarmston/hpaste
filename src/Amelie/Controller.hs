@@ -17,6 +17,7 @@ import Amelie.Types
 import Amelie.Types.Cache
 
 import Control.Applicative
+import Control.Concurrent.Chan    (Chan)
 import Control.Monad.Reader       (runReaderT)
 import Data.ByteString            (ByteString)
 import Data.ByteString.UTF8       (toString)
@@ -28,10 +29,10 @@ import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)
 
 -- | Run a controller handler.
-runHandler :: Pool -> Cache -> Controller () -> Snap ()
-runHandler pool cache ctrl = do
+runHandler :: Config -> Pool -> Cache -> Chan Text -> Controller () -> Snap ()
+runHandler conf pool cache anns ctrl = do
   withPoolConnection pool $ \conn -> do
-    let state = ControllerState conn cache
+    let state = ControllerState conf conn cache anns
     runReaderT (runController ctrl) state 
 
 -- | Strictly renders HTML to Text before outputting it via Snap.

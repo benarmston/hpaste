@@ -18,13 +18,21 @@ module Amelie.Model.Paste
 
 import Amelie.Types
 import Amelie.Model
+import Amelie.Model.Announcer
 
 import Control.Applicative    ((<$>))
 import Control.Monad
+import Control.Monad.Env
 import Control.Monad.IO
+import Data.Char
+import Data.List              (find)
 import Data.Maybe             (fromMaybe,listToMaybe)
+import Data.Monoid.Operator   ((++))
+import Data.Text              (Text,unpack,pack)
 import Data.Text.IO           as T (writeFile)
+import Data.Text.Lazy         (fromStrict)
 import Language.Haskell.HLint
+import Prelude                hiding ((++))
 import System.Directory
 import System.FilePath
 
@@ -69,16 +77,16 @@ getAnnotations pid =
         (Only pid)
 
 -- | Create a paste, or update an existing one.
-createOrEdit :: PasteSubmit -> Model (Maybe PasteId)
-createOrEdit paste@PasteSubmit{..} = do
+createOrEdit :: [Channel] -> PasteSubmit -> Model (Maybe PasteId)
+createOrEdit chans paste@PasteSubmit{..} = do
   case pasteSubmitId of
-    Nothing  -> createPaste paste
+    Nothing  -> createPaste chans paste
     Just pid -> do updatePaste pid paste
                    return $ Just pid
 
 -- | Create a new paste.
-createPaste :: PasteSubmit -> Model (Maybe PasteId)
-createPaste ps@PasteSubmit{..} = do
+createPaste :: [Channel] -> PasteSubmit -> Model (Maybe PasteId)
+createPaste chans ps@PasteSubmit{..} = do
   pid <- single ["INSERT INTO paste"
                 ,"(title,author,content,channel,language)"
                 ,"VALUES"
@@ -86,19 +94,44 @@ createPaste ps@PasteSubmit{..} = do
                 ,"returning id"]
                 (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
                 ,pasteSubmitChannel,pasteSubmitLanguage)
-  case pid of
-    Nothing  -> return ()
-    Just p -> do
-      hints <- generateHints ps p
-      forM_ hints $ \hint ->
-        exec ["INSERT INTO hint"
-             ,"(paste,type,content)"
-             ,"VALUES"
-             ,"(?,?,?)"]
-             (pid
-             ,suggestionSeverity hint
-             ,show hint)
+  let withPid f = maybe (return ()) (f ps) pid
+  withPid createHints
+  case pasteSubmitChannel >>= lookupChan of
+    Nothing   -> return ()
+    Just chan -> withPid (announcePaste (channelName chan))
   return pid
+
+  where lookupChan cid = find ((==cid).channelId) chans
+
+-- | Create the hints for a paste.
+createHints :: PasteSubmit -> PasteId -> Model ()
+createHints ps pid = do
+  hints <- generateHints ps pid
+  forM_ hints $ \hint ->
+    exec ["INSERT INTO hint"
+         ,"(paste,type,content)"
+         ,"VALUES"
+         ,"(?,?,?)"]
+         (pid
+         ,suggestionSeverity hint
+         ,show hint)
+
+-- | Announce the paste.
+announcePaste :: Text -> PasteSubmit -> PasteId -> Model ()
+announcePaste channel PasteSubmit{..} pid = do
+  conf <- env modelStateConfig  
+  announce (fromStrict channel) $ fromStrict $
+    nick ++ " pasted “" ++ pasteSubmitTitle ++ "” at " ++ link conf
+  where nick | validNick (unpack pasteSubmitAuthor) = pasteSubmitAuthor
+             | otherwise = "“" ++ pasteSubmitAuthor ++ "”"
+        link Config{..} = "http://" ++ pack configDomain ++ "/" ++ pack (show pid')
+        pid' = fromIntegral pid :: Integer
+
+-- | Is a nickname valid? Digit/letter or one of these: -_/\\;()[]{}?`'
+validNick :: String -> Bool
+validNick s = first && all ok s && length s > 0 where
+  ok c = isDigit c || isLetter c || elem c "-_/\\;()[]{}?`'"
+  first = all (\c -> isDigit c || isLetter c) $ take 1 s
 
 -- | Get hints for a Haskell paste from hlint.
 generateHints :: PasteSubmit -> PasteId -> Model [Suggestion]

@@ -11,6 +11,7 @@ import Database.PostgreSQL.Simple (ConnectInfo)
 data Config = Config {
     configAnnounce :: Announcer
   , configPostgres :: ConnectInfo
+  , configDomain   :: String
   } deriving (Show)
 
 -- | Announcer configuration.
@@ -18,5 +19,5 @@ data Announcer = Announcer {
     announceUser :: String
   , announcePass :: String
   , announceHost :: String
-  , announcePort :: String
+  , announcePort :: Int
 } deriving (Show)

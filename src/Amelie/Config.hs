@@ -22,9 +22,13 @@ getConfig conf = do
         [pghost,pgport,pguser,pgpass,pgdb]
           <- mapM (get c "POSTGRESQL")
                   ["host","port","user","pass","db"]
+        [domain]
+          <- mapM (get c "WEB")
+                  ["domain"]
         return Config {
-           configAnnounce = Announcer user pass port host
+           configAnnounce = Announcer user pass host (read port)
          , configPostgres = ConnectInfo pghost (read pgport) pguser pgpass pgdb
+         , configDomain = domain
          }
   case config of
     Left cperr -> error $ show cperr

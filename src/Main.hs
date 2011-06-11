@@ -1,3 +1,4 @@
+{-# OPTIONS -Wall #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | Main entry point.
@@ -14,13 +15,16 @@ import Amelie.Controller.Paste    as Paste
 import Amelie.Controller.Raw      as Raw
 import Amelie.Controller.Script   as Script
 import Amelie.Controller.Style    as Style
+import Amelie.Model.Announcer     (newAnnouncer)
 import Amelie.Types
 import Amelie.Types.Cache
 
-import Snap.Http.Server
+import Snap.Http.Server           hiding (Config)
 import Snap.Types
 import Snap.Util.FileServe
 
+import Control.Concurrent.Chan    (Chan)
+import Data.Text.Lazy             (Text)
 import Database.PostgreSQL.Simple (Pool,newPool)
 import System.Environment
 
@@ -29,15 +33,16 @@ main :: IO ()
 main = do
   cpath:_ <- getArgs
   config <- getConfig cpath
-  p <- newPool (configPostgres config)
+  announces <- newAnnouncer (configAnnounce config)
+  pool <- newPool (configPostgres config)
   cache <- newCache
   setUnicodeLocale "en_US"
-  httpServe server (serve p cache)
-  where server = addListen (ListenHttp "0.0.0.0" 10000) defaultConfig
+  httpServe server (serve config pool cache announces)
+ where server = addListen (ListenHttp "0.0.0.0" 10000) defaultConfig
 
 -- | Serve the controllers.
-serve :: Pool -> Cache -> Snap ()
-serve p cache = route routes where
+serve :: Config -> Pool -> Cache -> Chan Text -> Snap ()
+serve conf p cache ans = route routes where
   routes = [("/css/amelie.css", run Style.handle)
            ,("/js/amelie.js", run Script.handle)
            ,("/css/",serveDirectory "wwwroot/css")
@@ -51,4 +56,4 @@ serve p cache = route routes where
            ,("/browse/page/:page",run Browse.handle)
            ,("/browse",run Browse.handle)
            ]
-  run = runHandler p cache
+  run = runHandler conf p cache ans

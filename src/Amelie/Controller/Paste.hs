@@ -79,7 +79,7 @@ pasteForm channels languages defChan = do
     Just PasteSubmit{pasteSubmitSpamTrap=Just{}} -> goHome
     Just paste -> do
       resetCache Key.Home
-      pid <- model $ createOrEdit paste
+      pid <- model $ createOrEdit channels paste
       maybe (return ()) redirectToPaste pid
   return html
 

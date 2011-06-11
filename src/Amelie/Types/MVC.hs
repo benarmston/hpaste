@@ -12,19 +12,24 @@ module Amelie.Types.MVC
        where
 
 import Amelie.Types.Cache
+import Amelie.Types.Config
 
 import Control.Applicative        (Applicative,Alternative)
+import Control.Concurrent.Chan    (Chan)
 import Control.Monad              (MonadPlus)
 import Control.Monad.Catch        (MonadCatchIO)
 import Control.Monad.Reader       (ReaderT,MonadReader)
 import Control.Monad.Trans        (MonadIO)
+import Data.Text.Lazy             (Text)
 import Database.PostgreSQL.Simple (Connection)
 import Snap.Types                 (Snap,MonadSnap)
 
 -- | The state accessible to the controller (DB/session stuff).
 data ControllerState = ControllerState {
-    controllerStateConn  :: Connection
-  , controllerStateCache :: Cache
+    controllerStateConfig :: Config
+  , controllerStateConn   :: Connection
+  , controllerStateCache  :: Cache
+  , controllerStateAnns   :: Chan Text
   }
 
 -- | The controller monad.
@@ -42,7 +47,9 @@ newtype Controller a = Controller {
 
 -- | The state accessible to the model (just DB connection).
 data ModelState = ModelState {
-    modelStateConn :: Connection
+    modelStateConn   :: Connection
+  , modelStateAnns   :: Chan Text
+  , modelStateConfig :: Config
   }
 
 -- | The model monad (limited access to IO, only DB access).
