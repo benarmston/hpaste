@@ -1,0 +1,12 @@
+[POSTGRESQL]
+host = 127.0.0.1
+port = 5432
+user = <YOURUSER>
+pass = <YOURPASS>
+db = <YOURDB>
+
+[ANNOUNCE]
+user = hpaste
+pass = <YOURPASS>
+host = 127.0.0.1
+port = 6667

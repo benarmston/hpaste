@@ -4,3 +4,4 @@ log
 src/TAGS
 *.hi
 *.o
+amelie.conf

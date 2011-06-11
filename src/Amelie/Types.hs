@@ -9,7 +9,8 @@ module Amelie.Types
        ,module Amelie.Types.Language
        ,module Amelie.Types.Page
        ,module Amelie.Types.Newtypes
-       ,module Amelie.Types.View)
+       ,module Amelie.Types.View
+       ,module Amelie.Types.Config)
        where
 
 import Amelie.Types.MVC
@@ -19,3 +20,4 @@ import Amelie.Types.Language
 import Amelie.Types.Page
 import Amelie.Types.Newtypes
 import Amelie.Types.View
+import Amelie.Types.Config

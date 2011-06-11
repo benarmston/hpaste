@@ -4,6 +4,7 @@
 
 module Main (main) where
 
+import Amelie.Config
 import Amelie.Controller
 import Amelie.Controller.Browse   as Browse
 import Amelie.Controller.Cache    (newCache)
@@ -13,7 +14,6 @@ import Amelie.Controller.Paste    as Paste
 import Amelie.Controller.Raw      as Raw
 import Amelie.Controller.Script   as Script
 import Amelie.Controller.Style    as Style
-import Amelie.Model.Config        (auth)
 import Amelie.Types
 import Amelie.Types.Cache
 
@@ -22,15 +22,18 @@ import Snap.Types
 import Snap.Util.FileServe
 
 import Database.PostgreSQL.Simple (Pool,newPool)
+import System.Environment
 
 -- | Main entry point.
 main :: IO ()
 main = do
-  p <- newPool auth
+  cpath:_ <- getArgs
+  config <- getConfig cpath
+  p <- newPool (configPostgres config)
   cache <- newCache
   setUnicodeLocale "en_US"
-  httpServe config (serve p cache)
-  where config = addListen (ListenHttp "0.0.0.0" 10000) defaultConfig
+  httpServe server (serve p cache)
+  where server = addListen (ListenHttp "0.0.0.0" 10000) defaultConfig
 
 -- | Serve the controllers.
 serve :: Pool -> Cache -> Snap ()
