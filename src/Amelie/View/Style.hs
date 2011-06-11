@@ -24,6 +24,7 @@ style = renderCSS $ runCSS $ do
   home
   browse
   footer
+  activity
 
 -- | Footer.
 footer :: CSS Rule
@@ -50,6 +51,10 @@ layout = do
   classRule "wrap" $ do
     margin "auto"
     textAlign "left"
+    
+  classRule "nav" $ do
+    float "right"
+    marginTop "1em"
 
 -- | Paste form.
 form :: CSS Rule
@@ -222,3 +227,10 @@ browse = do
     subRule ".amelie-inner" $ do
       margin "auto"
       width "15em"
+
+-- | Developer activity page styles.
+activity :: CSS Rule
+activity = do
+  rule "#activity" $ do
+    subRule ".amelie-wrap" $ do
+      width "50em"

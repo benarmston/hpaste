@@ -38,3 +38,5 @@ Executable amelie
                     ,directory     >= 1.0
                     ,blaze-builder >= 0.2
                     ,ConfigFile    >= 1.0
+                    ,feed          >= 0.3
+                    ,download-curl >= 0.1

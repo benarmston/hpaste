@@ -14,6 +14,7 @@ import Data.Text.Lazy          (Text)
 data Key =
     Home
   | Paste Integer
+  | Activity
     deriving (Eq,Ord)
 
 data Cache =

@@ -13,7 +13,7 @@ import           Amelie.View.Html
 
 import           Data.Monoid.Operator        ((++))
 import           Prelude                     hiding ((++))
-import           Text.Blaze.Html5            as H hiding (map)
+import           Text.Blaze.Html5            as H hiding (map,nav)
 import qualified Text.Blaze.Html5.Attributes as A
 
 -- | Render the page in a layout.
@@ -28,6 +28,7 @@ layoutPage Page{..} = do
       title $ toHtml $ pageTitle ++ " :: hpaste — Haskell Pastebin"
     body ! A.id (toValue pageName) $
       wrap $ do
+        nav
         logo
         pageBody
         foot
@@ -45,6 +46,12 @@ logo = do
 -- | Layout wrapper.
 wrap :: Html -> Html
 wrap x = H.div ! aClass "wrap" $ x
+
+-- | Navigation.
+nav :: Html
+nav = do
+  H.div ! aClass "nav" $ do
+    a ! A.href "/activity" $ "Changelog"
 
 -- | Page footer.
 foot :: Html

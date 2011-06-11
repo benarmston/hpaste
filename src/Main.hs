@@ -7,6 +7,7 @@ module Main (main) where
 
 import Amelie.Config
 import Amelie.Controller
+import Amelie.Controller.Activity as Activity
 import Amelie.Controller.Browse   as Browse
 import Amelie.Controller.Cache    (newCache)
 import Amelie.Controller.Home     as Home
@@ -55,5 +56,6 @@ serve conf p cache ans = route routes where
            ,("/browse/page/:page/offset/:offset",run Browse.handle)
            ,("/browse/page/:page",run Browse.handle)
            ,("/browse",run Browse.handle)
+           ,("/activity",run Activity.handle)
            ]
   run = runHandler conf p cache ans

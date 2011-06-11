@@ -10,7 +10,8 @@ module Amelie.Types
        ,module Amelie.Types.Page
        ,module Amelie.Types.Newtypes
        ,module Amelie.Types.View
-       ,module Amelie.Types.Config)
+       ,module Amelie.Types.Config
+       ,module Amelie.Types.Activity)
        where
 
 import Amelie.Types.MVC
@@ -21,3 +22,4 @@ import Amelie.Types.Page
 import Amelie.Types.Newtypes
 import Amelie.Types.View
 import Amelie.Types.Config
+import Amelie.Types.Activity
