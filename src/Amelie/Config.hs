@@ -25,15 +25,16 @@ getConfig conf = do
         [domain]
           <- mapM (get c "WEB")
                   ["domain"]
-        [commits]
+        [commits,url]
           <- mapM (get c "DEV")
-                  ["commits"]
+                  ["commits","repo_url"]
                   
         return Config {
            configAnnounce = Announcer user pass host (read port)
          , configPostgres = ConnectInfo pghost (read pgport) pguser pgpass pgdb
          , configDomain = domain
          , configCommits = commits
+         , configRepoURL = url
          }
   case config of
     Left cperr -> error $ show cperr

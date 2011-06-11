@@ -13,6 +13,7 @@ data Config = Config {
   , configPostgres :: ConnectInfo
   , configDomain   :: String
   , configCommits  :: String
+  , configRepoURL  :: String
   } deriving (Show)
 
 -- | Announcer configuration.

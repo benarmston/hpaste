@@ -18,21 +18,20 @@ import Prelude            hiding ((++))
 import Text.Blaze.Html5   as H hiding (map)
 
 -- | Render the activity page.
-page :: [Commit] -> Html
-page commits =
+page :: String -> [Commit] -> Html
+page repo commits =
   layoutPage $ Page {
     pageTitle = "Development activity"
-  , pageBody = activity commits
+  , pageBody = activity repo commits
   , pageName = "activity"
   }
 
 -- | View the paginated pastes.
-activity :: [Commit] -> Html
-activity commits = do
+activity :: String -> [Commit] -> Html
+activity repo commits = do
   darkSection "Development activity" $ do
     p $ do "Repository: "
-           href ("https://github.com/chrisdone/amelie/" :: Text)
-                ("https://github.com/chrisdone/amelie/" :: Text)
+           href repo repo
   forM_ commits $ \Commit{..} -> do
     lightSection commitTitle $ do
       p $ toHtml $ show commitDate

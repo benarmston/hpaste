@@ -20,6 +20,7 @@ handle :: Controller ()
 handle = do
   html <- cache Key.Activity $ do
     uri <- env $ configCommits . controllerStateConfig
+    repourl <- env $ configRepoURL . controllerStateConfig
     commits <- model $ getCommits uri
-    return $ Just $ page commits
+    return $ Just $ page repourl commits
   maybe (return ()) outputText html
