@@ -33,8 +33,12 @@ resizePage = do
   each (do setWidth (mathMax (val max) 500)
                     (j ".amelie-wrap")
            return true)
-       (j ".amelie-code,.amelie-latest-pastes")
-
+       (j ".amelie-code")
+  each (do setWidth (mathMax (getWidth this') 500)
+                    (j ".amelie-wrap")
+           return true)
+       (j ".amelie-latest-pastes")
+       
 -- | Collapse/expand hints when toggled.
 toggleHints :: HJScript ()
 toggleHints = do
