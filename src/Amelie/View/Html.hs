@@ -8,6 +8,7 @@ module Amelie.View.Html
   (aClass
   ,aClasses
   ,darkSection
+  ,darkNoTitleSection
   ,lightSection
   ,lightNoTitleSection
   ,warnNoTitleSection
@@ -58,6 +59,12 @@ darkSection :: Text -> Html -> Html
 darkSection title inner =
   H.div ! aClasses ["section","section-dark"] $ do
     h2 $ toHtml title
+    inner
+
+-- | A dark section.
+darkNoTitleSection :: Html -> Html
+darkNoTitleSection inner =
+  H.div ! aClasses ["section","section-dark"] $ do
     inner
 
 -- | A light section.

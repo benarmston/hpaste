@@ -25,7 +25,12 @@ script = pack $ show $ snd $ evalHJScript $ do
 -- | Resize the width of the page to match content width.
 resizePage :: HJScript ()
 resizePage = do
-  each (do setWidth (mathMax (getWidth this' + 50) 500)
+  max <- varWith (int 0)
+  each (do max .=. (mathMax 500
+                            (mathMax (getWidth this' + 50) (val max)))
+           return true)
+       (j ".amelie-code")
+  each (do setWidth (mathMax (val max) 500)
                     (j ".amelie-wrap")
            return true)
        (j ".amelie-code,.amelie-latest-pastes")

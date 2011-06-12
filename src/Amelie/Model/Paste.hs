@@ -10,6 +10,7 @@ module Amelie.Model.Paste
   (getLatestPastes
   ,getPasteById
   ,createOrEdit
+  ,createPaste
   ,getAnnotations
   ,getSomePastes
   ,countPublicPastes
@@ -20,12 +21,12 @@ import Amelie.Types
 import Amelie.Model
 import Amelie.Model.Announcer
 
-import Control.Applicative    ((<$>))
+import Control.Applicative    ((<$>),(<|>))
 import Control.Monad
 import Control.Monad.Env
 import Control.Monad.IO
 import Data.Char
-import Data.List              (find)
+import Data.List              (find,intercalate)
 import Data.Maybe             (fromMaybe,listToMaybe)
 import Data.Monoid.Operator   ((++))
 import Data.Text              (Text,unpack,pack)
@@ -84,22 +85,23 @@ createOrEdit chans paste@PasteSubmit{..} = do
     Just pid -> do updatePaste pid paste
                    return $ Just pid
 
--- | Create a new paste.
+-- | Create a new paste (possibly editing an existing one).
 createPaste :: [Channel] -> PasteSubmit -> Model (Maybe PasteId)
 createPaste chans ps@PasteSubmit{..} = do
   pid <- single ["INSERT INTO paste"
-                ,"(title,author,content,channel,language)"
+                ,"(title,author,content,channel,language,annotation_of)"
                 ,"VALUES"
-                ,"(?,?,?,?,?)"
+                ,"(?,?,?,?,?,?)"
                 ,"returning id"]
                 (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
-                ,pasteSubmitChannel,pasteSubmitLanguage)
+                ,pasteSubmitChannel,pasteSubmitLanguage,pasteSubmitId)
   let withPid f = maybe (return ()) (f ps) pid
+      parentPid = pasteSubmitId <|> pid
   withPid createHints
   case pasteSubmitChannel >>= lookupChan of
     Nothing   -> return ()
-    Just chan -> withPid (announcePaste (channelName chan))
-  return pid
+    Just chan -> maybe (return ()) (announcePaste (channelName chan) ps) parentPid
+  return parentPid
 
   where lookupChan cid = find ((==cid).channelId) chans
 
@@ -156,7 +158,7 @@ updatePaste pid PasteSubmit{..} = do
   _ <- exec (["UPDATE paste"
              ,"SET"]
              ++
-             map set (words "title author content language channel")
+             [intercalate ", " (map set (words fields))]
              ++
              ["WHERE id = ?"])
             (pasteSubmitTitle
@@ -167,4 +169,5 @@ updatePaste pid PasteSubmit{..} = do
             ,pid)
   return ()
   
-    where set key = unwords [key,"=","?"]
+    where fields = "title author content channel language"
+          set key = unwords [key,"=","?"]

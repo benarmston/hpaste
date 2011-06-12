@@ -158,6 +158,8 @@ paste = do
       width "8em"
       display "block"
       float "left"
+  classRule "paste-nav" $ do
+    float "right"
 
 -- | Utility styles to help with HTML weirdness.
 utils :: CSS Rule

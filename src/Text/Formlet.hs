@@ -132,22 +132,23 @@ wrap :: (Html -> Html) -> Formlet Text -> Formlet Text
 wrap f formlet@Formlet{..} = formlet { formletHtml = f . formletHtml }
 
 -- | Make a text input formlet with a label.
-textInput :: Text -> Text -> Formlet Text
-textInput name caption =
+textInput :: Text -> Text -> Maybe Text -> Formlet Text
+textInput name caption def =
   formlet name $ \value -> do
     p $ H.label $ do
       H.span $ toHtml $ caption ++ ": "
       input ! A.name (toValue name)
-            ! A.value (toValue $ fromMaybe "" value)
+            ! A.value (toValue $ fromMaybe "" (value <|> def))
             ! A.class_ "text"
 
 -- | Make a textarea input with a label.
-areaInput :: Text -> Text -> Formlet Text
-areaInput name caption =
+areaInput :: Text -> Text -> Maybe Text -> Formlet Text
+areaInput name caption def =
   formlet name $ \value -> do
     p $ H.label $ do
       H.span $ toHtml $ caption ++ ": "
-      textarea ! A.name (toValue name) $ toHtml $ fromMaybe "" value
+      textarea ! A.name (toValue name) $
+        toHtml $ fromMaybe "" (value <|> def)
 
 -- | Make a drop down input with a label.
 dropInput :: [(Text,Text)] -> Text -> Text -> Text -> Formlet Text

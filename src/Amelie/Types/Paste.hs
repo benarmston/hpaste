@@ -72,19 +72,21 @@ instance QueryResults Paste where
 
 data PasteFormlet = PasteFormlet {
    pfSubmitted :: Bool
- , pfErrors :: [Text]
- , pfParams :: Params
+ , pfErrors    :: [Text]
+ , pfParams    :: Params
  , pfLanguages :: [Language]
- , pfChannels :: [Channel]
- , pfDefChan :: Maybe Text
+ , pfChannels  :: [Channel]
+ , pfDefChan   :: Maybe Text
+ , pfEditPaste :: Maybe Paste
 }
 
 data PastePage = PastePage {
-    ppPaste :: Paste
-  , ppChans :: [Channel]
-  , ppLangs :: [Language]
-  , ppHints :: [Hint]
-  , ppAnnotations :: [Paste]
+    ppPaste           :: Paste
+  , ppChans           :: [Channel]
+  , ppLangs           :: [Language]
+  , ppHints           :: [Hint]
+  , ppAnnotations     :: [Paste]
+  , ppAnnotationHints :: [[Hint]]
 }
 
 instance Param Severity where

@@ -6,7 +6,8 @@
 
 module Amelie.Controller.Paste
   (handle
-  ,pasteForm)
+  ,pasteForm
+  ,getPasteId)
   where
 
 import Amelie.Types
@@ -36,7 +37,7 @@ import Text.Formlet
 -- | Handle the paste page.
 handle :: Controller ()
 handle = do
-  pid <- (fmap toString >=> readMay) <$> getParam "id"
+  pid <- getPasteId
   justOrGoHome pid $ \(pid :: Integer) -> do
       html <- cache (Key.Paste pid) $ do
         paste <- model $ getPasteById (fromIntegral pid)
@@ -45,6 +46,7 @@ handle = do
           Just paste -> do
             hints <- model $ getHints (pasteId paste)
             pastes <- model $ getAnnotations (fromIntegral pid)
+            ahints <- model $ mapM (getHints.pasteId) pastes
             chans <- model $ getChannels
             langs <- model $ getLanguages
             return $ Just $ page PastePage {
@@ -53,12 +55,13 @@ handle = do
             , ppAnnotations = pastes
             , ppHints       = hints
             , ppPaste       = paste
+            , ppAnnotationHints = ahints
             }
       justOrGoHome html outputText
 
 -- | Control paste editing / submission.
-pasteForm :: [Channel] -> [Language] -> Maybe Text -> Controller Html
-pasteForm channels languages defChan = do
+pasteForm :: [Channel] -> [Language] -> Maybe Text -> Maybe Paste -> Controller Html
+pasteForm channels languages defChan editPaste = do
   params <- getParams
   submitted <- isJust <$> getParam "submit"
   let formlet = PasteFormlet {
@@ -68,6 +71,7 @@ pasteForm channels languages defChan = do
         , pfChannels  = channels
         , pfLanguages = languages
         , pfDefChan   = defChan
+        , pfEditPaste = editPaste
         }
       (getValue,_) = pasteFormlet formlet
       value = formletValue getValue params
@@ -79,7 +83,8 @@ pasteForm channels languages defChan = do
     Just PasteSubmit{pasteSubmitSpamTrap=Just{}} -> goHome
     Just paste -> do
       resetCache Key.Home
-      pid <- model $ createOrEdit channels paste
+      maybe (return ()) (resetCache . Key.Paste . fromIntegral) $ pasteSubmitId paste
+      pid <- model $ createPaste channels paste
       maybe (return ()) redirectToPaste pid
   return html
 
@@ -87,3 +92,7 @@ pasteForm channels languages defChan = do
 redirectToPaste :: PasteId -> Controller ()
 redirectToPaste (PasteId pid) =
   redirect $ "/" ++ fromString (show pid)
+
+-- | Get the paste id.
+getPasteId :: Controller (Maybe Integer)
+getPasteId = (fmap toString >=> readMay) <$> getParam "id"

@@ -1,4 +1,4 @@
-{-# OPTIONS -Wall #-}
+{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | Create new paste controller.
@@ -8,11 +8,13 @@ module Amelie.Controller.New
   where
 
 import Amelie.Controller
-import Amelie.Controller.Paste (pasteForm)
+import Amelie.Controller.Paste (pasteForm,getPasteId)
 import Amelie.Model
 import Amelie.Model.Channel    (getChannels)
 import Amelie.Model.Language   (getLanguages)
-import Amelie.View.New         (page)
+import Amelie.Model.Paste      (getPasteById)
+import Amelie.View.Edit        as Edit (page)
+import Amelie.View.New         as New (page)
 
 import Control.Applicative
 import Data.Text.Encoding      (decodeUtf8)
@@ -23,5 +25,13 @@ handle = do
   chans <- model $ getChannels
   langs <- model $ getLanguages
   defChan <- fmap decodeUtf8 <$> getParam "channel"
-  form <- pasteForm chans langs defChan
-  output $ page form
+  pid <- getPasteId
+  case pid of
+    Just pid -> do
+      paste <- model $ getPasteById (fromIntegral pid)
+      form <- pasteForm chans langs defChan paste
+      justOrGoHome paste $ \paste -> do
+        output $ Edit.page paste form
+    Nothing -> do
+      form <- pasteForm chans langs defChan Nothing
+      output $ New.page form
