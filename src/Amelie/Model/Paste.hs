@@ -88,22 +88,22 @@ createOrEdit chans paste@PasteSubmit{..} = do
 -- | Create a new paste (possibly editing an existing one).
 createPaste :: [Channel] -> PasteSubmit -> Model (Maybe PasteId)
 createPaste chans ps@PasteSubmit{..} = do
-  pid <- single ["INSERT INTO paste"
+  res <- single ["INSERT INTO paste"
                 ,"(title,author,content,channel,language,annotation_of)"
                 ,"VALUES"
                 ,"(?,?,?,?,?,?)"
                 ,"returning id"]
                 (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
                 ,pasteSubmitChannel,pasteSubmitLanguage,pasteSubmitId)
-  let withPid f = maybe (return ()) (f ps) pid
-      parentPid = pasteSubmitId <|> pid
-  withPid createHints
-  case pasteSubmitChannel >>= lookupChan of
-    Nothing   -> return ()
-    Just chan -> maybe (return ()) (announcePaste (channelName chan) ps) parentPid
-  return parentPid
+  just (pasteSubmitChannel >>= lookupChan) $ \chan ->
+    just res $ \pid -> do
+      createHints ps pid
+      annotated <- maybe (return Nothing) getPasteById pasteSubmitId
+      announcePaste annotated (channelName chan) ps pid
+  return (pasteSubmitId <|> res)
 
   where lookupChan cid = find ((==cid).channelId) chans
+        just j m = maybe (return ()) m j
 
 -- | Create the hints for a paste.
 createHints :: PasteSubmit -> PasteId -> Model ()
@@ -119,15 +119,21 @@ createHints ps pid = do
          ,show hint)
 
 -- | Announce the paste.
-announcePaste :: Text -> PasteSubmit -> PasteId -> Model ()
-announcePaste channel PasteSubmit{..} pid = do
+announcePaste :: Maybe Paste -> Text -> PasteSubmit -> PasteId -> Model ()
+announcePaste annotated channel PasteSubmit{..} pid = do
   conf <- env modelStateConfig  
   announce (fromStrict channel) $ fromStrict $
-    nick ++ " pasted “" ++ pasteSubmitTitle ++ "” at " ++ link conf
+    nick ++ " " ++ verb ++ " “" ++ pasteSubmitTitle ++ "” at " ++ link conf
   where nick | validNick (unpack pasteSubmitAuthor) = pasteSubmitAuthor
              | otherwise = "“" ++ pasteSubmitAuthor ++ "”"
-        link Config{..} = "http://" ++ pack configDomain ++ "/" ++ pack (show pid')
-        pid' = fromIntegral pid :: Integer
+        link Config{..} = "http://" ++ pack configDomain ++ "/" ++ pid'
+        pid' = case annotated of
+                 Just Paste{..} -> showPid pasteId ++ "#a" ++ showPid pid
+                 Nothing -> showPid pid
+        verb = case annotated of
+                 Just Paste{..} -> "annotated “" ++ pasteTitle ++ "” with"
+                 Nothing -> "pasted"
+        showPid p = pack $ show $ (fromIntegral p :: Integer)
 
 -- | Is a nickname valid? Digit/letter or one of these: -_/\\;()[]{}?`'
 validNick :: String -> Bool

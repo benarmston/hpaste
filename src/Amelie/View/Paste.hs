@@ -114,6 +114,10 @@ viewAnnotations chans langs pastes = do
 -- | View a paste's details and content.
 viewPaste :: [Channel] -> [Language] -> (Paste,[Hint]) -> Html
 viewPaste chans langs (paste@Paste{..},hints) = do
+  case pasteParent of
+    Nothing -> return ()
+    Just{}  -> let an = "a" ++ show (fromIntegral pasteId :: Integer)
+               in a ! A.name (toValue an) $ return ()
   pasteDetails chans langs paste
   pasteContent langs paste
   viewHints hints
