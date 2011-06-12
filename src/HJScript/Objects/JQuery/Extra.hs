@@ -19,6 +19,16 @@ setWidth :: IsJQuery o => Exp Int -> o -> HJScript ()
 setWidth w o = do
   runExp $ methodCall "width" w o
 
+-- | Append an element to another.
+append :: IsJQuery o => Exp a -> o -> HJScript ()
+append w o = do
+  runExp $ methodCall "append" w o
+  
+-- | Prepend an element before another.
+prepend :: IsJQuery o => Exp a -> o -> HJScript ()
+prepend w o = do
+  runExp $ methodCall "prepend" w o
+
 -- | Add a class to an object.
 addClass :: IsJQuery o => String -> o -> HJScript ()
 addClass w o = do
@@ -48,6 +58,11 @@ css key value o = do
 getWidth :: IsJQuery o => o -> Exp Int
 getWidth o = do
   methodCall "width" () o
+
+-- | Get siblings of an elements.
+siblings :: IsJQuery o => String -> o -> JObject JQuery
+siblings q o = do
+  methodCall "siblings" (string q) o
 
 -- | When toggling by clicking, run these events on this object.
 toggle :: IsJQuery o => HJScript JBool -> HJScript JBool -> o -> HJScript ()

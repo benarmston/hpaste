@@ -126,8 +126,7 @@ viewPaste chans langs (paste@Paste{..},hints) = do
 pasteDetails :: [Channel] -> [Language] -> Paste -> Html
 pasteDetails chans langs paste@Paste{..} =
   darkNoTitleSection $ do
-    H.div ! aClass "paste-nav" $ do
-      href ("/edit/" ++ pack (show pasteId) ++ "") ("Annotate" :: Text)
+    pasteNav paste
     h2 $ toHtml $ fromStrict pasteTitle
     ul ! aClass "paste-specs" $ do
       detail "Paste" $ pasteLink paste $ "#" ++ show pasteId
@@ -140,6 +139,12 @@ pasteDetails chans langs paste@Paste{..} =
 
     where detail title content = do
             li $ do strong (title ++ ":"); toHtml content
+
+-- | Individual paste navigation.
+pasteNav :: Paste -> Html
+pasteNav Paste {..} =
+  H.div ! aClass "paste-nav" $ do
+    href ("/edit/" ++ pack (show pasteId) ++ "") ("Annotate" :: Text)
 
 -- | Show the paste content with highlighting.
 pasteContent :: [Language] -> Paste -> Html

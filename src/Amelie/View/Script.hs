@@ -9,11 +9,11 @@ module Amelie.View.Script
   (script)
   where
 
-import           Data.Text.Lazy                (Text,pack)
-import           HJScript
-import           HJScript.Objects.JQuery
-import           HJScript.Objects.JQuery.Extra
-import           Prelude                       hiding ((++),max)
+import Data.Text.Lazy                (Text,pack)
+import HJScript
+import HJScript.Objects.JQuery       hiding (prepend,append)
+import HJScript.Objects.JQuery.Extra
+import Prelude                       hiding ((++),max)
 
 -- | All scripts on the site. Not much to do.
 script :: Text
@@ -21,6 +21,7 @@ script = pack $ show $ snd $ evalHJScript $ do
   ready $ do
     resizePage
     toggleHints
+    togglePaste
 
 -- | Resize the width of the page to match content width.
 resizePage :: HJScript ()
@@ -58,3 +59,22 @@ toggleHints = do
           expand o = do
             css "height" "auto" o
             return false
+
+-- | Toggle paste details.
+togglePaste :: HJScript ()
+togglePaste = do
+  each (do btn <- varWith (j "<a href=\"\">Expand</a>")
+           this <- varWith this'
+           prepend (string " - ") this
+           prepend (val btn) this
+           details <- varWith (siblings ".amelie-paste-specs" this)
+           display "none" details
+           toggle (display "block" details)
+                  (display "none" details)
+                  btn
+           return true)
+       (j ".amelie-paste-nav")
+
+   where display prop o = do
+           css "display" prop o
+           return false

@@ -100,7 +100,7 @@ sections = do
     subRule "h2" $ do
       margin "0"
       fontSize "1.2em"
-      padding "0 0 0.5em 0"
+      padding "0"
   
   classRule "section-dark" $ do
     background "#453D5B"
@@ -148,7 +148,7 @@ sections = do
 paste :: CSS Rule
 paste = do
   classRule "paste-specs" $ do
-    margin "0"
+    margin "0.5em 0 0 0"
     padding "0"
     listStyle "none"
     lineHeight "1.5em"
@@ -216,6 +216,8 @@ home = do
   rule "#new" wrap
   classRule "browse-link" $ do
     margin "1em 0 0 0"
+  classRule "latest-pastes" $ do
+    marginTop "0.5em"
   
   where wrap = subRule ".amelie-wrap" $ do
                  width "50em"
