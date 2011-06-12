@@ -19,6 +19,11 @@ setWidth :: IsJQuery o => Exp Int -> o -> HJScript ()
 setWidth w o = do
   runExp $ methodCall "width" w o
 
+-- | Set the text of a DOM element.
+setText :: IsJQuery o => Exp String -> o -> HJScript ()
+setText w o = do
+  runExp $ methodCall "text" w o
+
 -- | Append an element to another.
 append :: IsJQuery o => Exp a -> o -> HJScript ()
 append w o = do

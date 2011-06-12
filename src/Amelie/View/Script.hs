@@ -68,13 +68,15 @@ togglePaste = do
            prepend (string " - ") this
            prepend (val btn) this
            details <- varWith (siblings ".amelie-paste-specs" this)
-           display "none" details
-           toggle (display "block" details)
-                  (display "none" details)
+           display btn "none" details
+           toggle (display btn "block" details)
+                  (display btn "none" details)
                   btn
            return true)
        (j ".amelie-paste-nav")
 
-   where display prop o = do
+   where display btn prop o = do
            css "display" prop o
+           setText (string caption) btn
            return false
+           where caption = if prop == "block" then "Collapse" else "Expand"
