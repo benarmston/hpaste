@@ -20,7 +20,8 @@ import Text.Blaze.Html5       as H hiding (map)
 viewHints :: [Hint] -> Html
 viewHints = mapM_ showHint where
   showHint hint =
-    section $ pre $ sequence_ $ intersperse br $ map toHtml lns
+    section $
+      pre ! aClass "hint" $ sequence_ $ intersperse br $ map toHtml lns
     where section = case hintType hint of
                       Ignore  -> \_ -> return ()
                       Warning -> warnNoTitleSection

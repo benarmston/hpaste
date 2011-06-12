@@ -20,6 +20,7 @@ style = renderCSS $ runCSS $ do
   paste
   utils
   highlighter
+  hints
   form
   home
   browse
@@ -94,7 +95,7 @@ sections = do
     borderRadius "5px"
     padding "10px"
     border "3px solid #000"
-    margin "0 0 1em 0"
+    margin "0 0 0.5em 0"
      
     subRule "h2" $ do
       margin "0"
@@ -234,3 +235,11 @@ activity = do
   rule "#activity" $ do
     subRule ".amelie-wrap" $ do
       width "50em"
+
+-- | Hlint hints
+hints :: CSS Rule
+hints = do
+  classRule "hint-highlight" $ do
+    background "#333"
+    color "#999"
+    border "1px solid #444"
