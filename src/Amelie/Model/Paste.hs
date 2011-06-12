@@ -74,7 +74,8 @@ getAnnotations :: PasteId -> Model [Paste]
 getAnnotations pid =
   query ["SELECT *"
         ,"FROM public_paste"
-        ,"WHERE annotation_of = ?"]
+        ,"WHERE annotation_of = ?"
+        ,"ORDER BY id ASC"]
         (Only pid)
 
 -- | Create a paste, or update an existing one.
