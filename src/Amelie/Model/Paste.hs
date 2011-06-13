@@ -96,9 +96,9 @@ createPaste chans ps@PasteSubmit{..} = do
                 ,"returning id"]
                 (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
                 ,pasteSubmitChannel,pasteSubmitLanguage,pasteSubmitId)
+  just res $ createHints ps
   just (pasteSubmitChannel >>= lookupChan) $ \chan ->
     just res $ \pid -> do
-      createHints ps pid
       annotated <- maybe (return Nothing) getPasteById pasteSubmitId
       announcePaste annotated (channelName chan) ps pid
   return (pasteSubmitId <|> res)
