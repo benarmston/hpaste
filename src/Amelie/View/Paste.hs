@@ -42,8 +42,9 @@ page :: PastePage -> Html
 page PastePage {ppPaste=p@Paste{..},..} =
   layoutPage $ Page {
     pageTitle = pasteTitle
-  , pageBody = do viewPaste ppChans ppLangs (p,ppHints)
-                  viewAnnotations ppChans
+  , pageBody = do viewPaste [] ppChans ppLangs (p,ppHints)
+                  viewAnnotations (p : ppAnnotations)
+                                  ppChans
                                   ppLangs
                                   (zip ppAnnotations ppAnnotationHints)
   , pageName = "paste"
@@ -107,26 +108,26 @@ getPasteId PasteFormlet{..} =
   return . (fromIntegral :: Integer -> PasteId)
 
 -- | View the paste's annotations.
-viewAnnotations :: [Channel] -> [Language] -> [(Paste,[Hint])] -> Html
-viewAnnotations chans langs pastes = do
-  mapM_ (viewPaste chans langs) pastes
+viewAnnotations :: [Paste] -> [Channel] -> [Language] -> [(Paste,[Hint])] -> Html
+viewAnnotations pastes chans langs annotations = do
+  mapM_ (viewPaste pastes chans langs) annotations
 
 -- | View a paste's details and content.
-viewPaste :: [Channel] -> [Language] -> (Paste,[Hint]) -> Html
-viewPaste chans langs (paste@Paste{..},hints) = do
+viewPaste :: [Paste] -> [Channel] -> [Language] -> (Paste,[Hint]) -> Html
+viewPaste pastes chans langs (paste@Paste{..},hints) = do
   case pasteParent of
     Nothing -> return ()
     Just{}  -> let an = "a" ++ show (fromIntegral pasteId :: Integer)
                in a ! A.name (toValue an) $ return ()
-  pasteDetails chans langs paste
+  pasteDetails pastes chans langs paste
   pasteContent langs paste
   viewHints hints
 
 -- | List the details of the page in a dark section.
-pasteDetails :: [Channel] -> [Language] -> Paste -> Html
-pasteDetails chans langs paste@Paste{..} =
+pasteDetails :: [Paste] -> [Channel] -> [Language] -> Paste -> Html
+pasteDetails pastes chans langs paste@Paste{..} =
   darkNoTitleSection $ do
-    pasteNav paste
+    pasteNav pastes paste
     h2 $ toHtml $ fromStrict pasteTitle
     ul ! aClass "paste-specs" $ do
       detail "Paste" $ pasteLink paste $ "#" ++ show pasteId
@@ -141,10 +142,22 @@ pasteDetails chans langs paste@Paste{..} =
             li $ do strong (title ++ ":"); toHtml content
 
 -- | Individual paste navigation.
-pasteNav :: Paste -> Html
-pasteNav Paste {..} =
+pasteNav :: [Paste] -> Paste -> Html
+pasteNav pastes paste =
   H.div ! aClass "paste-nav" $ do
-    href ("/edit/" ++ pack (show pasteId) ++ "") ("Annotate" :: Text)
+    diffLink
+    href ("/edit/" ++ pack (show pid) ++ "") ("Annotate" :: Text)
+    
+    where pid = pasteId paste
+          pairs = zip (drop 1 pastes) pastes
+          parent = fmap snd $ find ((==pid).pasteId.fst) $ pairs
+          diffLink =
+            case parent of
+              Nothing -> return ()
+              Just Paste{pasteId=prevId} -> do
+                href ("/diff/" ++ show prevId ++ "/" ++ show pid)
+                     ("Diff" :: Text)
+                " - "
 
 -- | Show the paste content with highlighting.
 pasteContent :: [Language] -> Paste -> Html

@@ -7,7 +7,9 @@
 module Amelie.Controller.Paste
   (handle
   ,pasteForm
-  ,getPasteId)
+  ,getPasteId
+  ,getPasteIdKey
+  ,withPasteKey)
   where
 
 import Amelie.Types
@@ -23,6 +25,7 @@ import Amelie.View.Paste       (pasteFormlet,page)
 
 import Control.Applicative
 import Control.Monad           ((>=>))
+import Data.ByteString         (ByteString)
 import Data.ByteString.UTF8    (toString)
 import Data.Maybe
 import Data.Monoid.Operator    ((++))
@@ -96,3 +99,17 @@ redirectToPaste (PasteId pid) =
 -- | Get the paste id.
 getPasteId :: Controller (Maybe Integer)
 getPasteId = (fmap toString >=> readMay) <$> getParam "id"
+
+-- | Get the paste id by a key.
+getPasteIdKey :: ByteString -> Controller (Maybe Integer)
+getPasteIdKey key = (fmap toString >=> readMay) <$> getParam key
+
+-- | With the 
+withPasteKey :: ByteString -> (Paste -> Controller a) -> Controller ()
+withPasteKey key with = do
+  pid <- getPasteIdKey key
+  justOrGoHome pid $ \(pid :: Integer) -> do
+    paste <- model $ getPasteById (fromIntegral pid)
+    justOrGoHome paste $ \paste -> do
+      _ <- with paste
+      return ()

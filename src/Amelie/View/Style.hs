@@ -174,6 +174,7 @@ classRule = rule . (".amelie-" ++)
 -- | Styles for the highlighter.
 highlighter :: CSS Rule
 highlighter = do
+  diff
   classRule "code" $ do
     tokens
     lineNumbers
@@ -183,6 +184,17 @@ highlighter = do
 
     subRule "td" $ do
       verticalAlign "top"
+
+-- | Style for diff groups.
+diff :: CSS Rule
+diff = do
+  classRule "diff-both" $
+    return ()
+  classRule "diff-first" $ do
+    backgroundColor "#FDD"
+    color "#695B5B"
+  classRule "diff-second" $ do
+    backgroundColor "#DFD"
 
 -- | Tokens colours and styles.
 tokens :: CSS (Either Property Rule)

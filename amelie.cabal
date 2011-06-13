@@ -40,3 +40,4 @@ Executable amelie
                     ,ConfigFile    >= 1.0
                     ,feed          >= 0.3
                     ,download-curl >= 0.1
+                    ,Diff          >= 0.1

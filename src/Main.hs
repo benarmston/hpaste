@@ -10,6 +10,7 @@ import Amelie.Controller
 import Amelie.Controller.Activity as Activity
 import Amelie.Controller.Browse   as Browse
 import Amelie.Controller.Cache    (newCache)
+import Amelie.Controller.Diff     as Diff
 import Amelie.Controller.Home     as Home
 import Amelie.Controller.New      as New
 import Amelie.Controller.Paste    as Paste
@@ -58,5 +59,6 @@ serve conf p cache ans = route routes where
            ,("/browse/page/:page",run Browse.handle)
            ,("/browse",run Browse.handle)
            ,("/activity",run Activity.handle)
+           ,("/diff/:this/:that",run Diff.handle)
            ]
   run = runHandler conf p cache ans
