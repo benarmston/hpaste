@@ -65,7 +65,7 @@ togglePaste :: HJScript ()
 togglePaste = do
   each (do btn <- varWith (j "<a href=\"\">Expand</a>")
            this <- varWith this'
-           prepend (" - " :: Exp String) this
+           prepend (string " - ") this
            prepend (val btn) this
            details <- varWith (siblings ".amelie-paste-specs" this)
            display btn "none" details
