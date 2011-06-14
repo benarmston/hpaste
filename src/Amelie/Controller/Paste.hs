@@ -87,7 +87,7 @@ pasteForm channels languages defChan editPaste = do
     Just paste -> do
       resetCache Key.Home
       maybe (return ()) (resetCache . Key.Paste . fromIntegral) $ pasteSubmitId paste
-      pid <- model $ createPaste channels paste
+      pid <- model $ createPaste languages channels paste
       maybe (return ()) redirectToPaste pid
   return html
 

@@ -79,16 +79,16 @@ getAnnotations pid =
         (Only pid)
 
 -- | Create a paste, or update an existing one.
-createOrEdit :: [Channel] -> PasteSubmit -> Model (Maybe PasteId)
-createOrEdit chans paste@PasteSubmit{..} = do
+createOrEdit :: [Language] -> [Channel] -> PasteSubmit -> Model (Maybe PasteId)
+createOrEdit langs chans paste@PasteSubmit{..} = do
   case pasteSubmitId of
-    Nothing  -> createPaste chans paste
+    Nothing  -> createPaste langs chans paste
     Just pid -> do updatePaste pid paste
                    return $ Just pid
 
 -- | Create a new paste (possibly editing an existing one).
-createPaste :: [Channel] -> PasteSubmit -> Model (Maybe PasteId)
-createPaste chans ps@PasteSubmit{..} = do
+createPaste :: [Language] -> [Channel] -> PasteSubmit -> Model (Maybe PasteId)
+createPaste langs chans ps@PasteSubmit{..} = do
   res <- single ["INSERT INTO paste"
                 ,"(title,author,content,channel,language,annotation_of)"
                 ,"VALUES"
@@ -96,7 +96,7 @@ createPaste chans ps@PasteSubmit{..} = do
                 ,"returning id"]
                 (pasteSubmitTitle,pasteSubmitAuthor,pasteSubmitPaste
                 ,pasteSubmitChannel,pasteSubmitLanguage,pasteSubmitId)
-  just res $ createHints ps
+  when (lang == Just "haskell") $ just res $ createHints ps
   just (pasteSubmitChannel >>= lookupChan) $ \chan ->
     just res $ \pid -> do
       annotated <- maybe (return Nothing) getPasteById pasteSubmitId
@@ -104,6 +104,8 @@ createPaste chans ps@PasteSubmit{..} = do
   return (pasteSubmitId <|> res)
 
   where lookupChan cid = find ((==cid).channelId) chans
+        lookupLang lid = find ((==lid).languageId) langs
+        lang = pasteSubmitLanguage >>= (fmap languageName . lookupLang)
         just j m = maybe (return ()) m j
 
 -- | Create the hints for a paste.
