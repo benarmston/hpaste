@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE FlexibleInstances #-}
 -- | CSS generation.
 
 module Text.CSS
@@ -10,8 +11,8 @@ module Text.CSS
   ,runCSS
   ,renderCSS
   ,renderPrettyCSS
-  ,rule
-  ,subRule)
+  ,rules
+  ,rule)
     where
 
 import           Text.CSS.Properties
@@ -52,20 +53,23 @@ renderPrettyCSS :: [Rule] -> Text
 renderPrettyCSS = mconcat . map renderRule where
   renderRule (Rule name props sub) =
     name ++ "{\n" ++ renderProps props ++ "\n}" ++ "\n" ++
-    renderCSS (map prefix sub)
+    renderPrettyCSS (map prefix sub)
       where prefix subr@Rule{ruleExpr} =
               subr { ruleExpr = name ++ " " ++ ruleExpr }
   renderProps = T.intercalate ";\n" . map (("    "++) . renderProp)
   renderProp (Property name value) = name ++ ": " ++ value
 
--- | Make a CSS rule.
-rule :: Text -> CSS (Either Property Rule) -> CSS Rule
-rule name getProps = do
-  let body = runBody getProps
-  tell $ [Rule name (lefts body) (rights body)]
+class Ruleable a where
+  rule :: Text -> CSS (Either Property Rule) -> CSS a
+  rules :: [Text] -> CSS (Either Property Rule) -> CSS a
+  rules rs body = mapM_ (`rule` body) rs
 
--- | Make a sub-CSS rule.
-subRule :: Text -> CSS (Either Property Rule) -> CSS (Either Property Rule)
-subRule name getProps = do
-  let body = runBody getProps
-  tell $ [Right $ Rule name (lefts body) (rights body)]
+instance Ruleable Rule where
+  rule name getProps = do
+    let body = runBody getProps
+    tell $ [Rule name (lefts body) (rights body)]
+
+instance Ruleable (Either Property Rule) where
+  rule name getProps = do
+    let body = runBody getProps
+    tell $ [Right $ Rule name (lefts body) (rights body)]

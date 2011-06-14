@@ -32,9 +32,9 @@ footer :: CSS Rule
 footer = do
   classRule "footer" $ do
     textAlign "center"
-    subRule "a" $ do 
+    rule "a" $ do 
       textDecoration "none"
-    subRule "a:hover" $ do
+    rule "a:hover" $ do
       textDecoration "underline"
 
 -- | General layout styles.
@@ -71,19 +71,19 @@ form = do
 inputs :: CSS Rule
 inputs =
   rule "form p label" $ do
-    subRule "textarea" $ do
+    rule "textarea" $ do
       width "100%"
       height "20em"
       clear "both"
       margin "1em 0 0 0"
          
-    subRule "textarea, input.text" $ do
+    rule "textarea, input.text" $ do
       border "2px solid #ddd"
       borderRadius "4px"
-    subRule "textarea:focus, input.text:focus" $ do
+    rule "textarea:focus, input.text:focus" $ do
       background "#eee"
       
-    subRule "span" $ do
+    rule "span" $ do
       float "left"
       width "7em"
       display "block"
@@ -97,7 +97,7 @@ sections = do
     border "3px solid #000"
     margin "0 0 0.5em 0"
      
-    subRule "h2" $ do
+    rule "h2" $ do
       margin "0"
       fontSize "1.2em"
       padding "0"
@@ -107,14 +107,14 @@ sections = do
     borderColor "#A9A0D2"
     color "#FFF"
 
-    subRule "h2" $ do
+    rule "h2" $ do
       color "#FFF"
     
-    subRule "a" $ do
+    rule "a" $ do
       color "#8ae0c2"
       textDecoration "none"
 
-    subRule "a:hover" $ do
+    rule "a:hover" $ do
       textDecoration "underline"
 
   classRule "section-light" $ do
@@ -122,7 +122,7 @@ sections = do
     borderColor "#EEE"
     color "#000"
 
-    subRule "h2" $ do
+    rule "h2" $ do
       color "#2D2542"
    
   classRule "section-error" $ do
@@ -130,18 +130,18 @@ sections = do
     color "#5b4444"
     border "1px solid #EFB3B3"
 
-    subRule "pre" $ do
+    rule "pre" $ do
       margin "0"
-    subRule "h2" $ do
+    rule "h2" $ do
       color "#2D2542"
    
   classRule "section-warn" $ do
     background "#FFF9C7"
     color "#915c31"
     border "1px solid #FFF178"
-    subRule "pre" $ do
+    rule "pre" $ do
       margin "0"
-    subRule "h2" $ do
+    rule "h2" $ do
       color "#2D2542"
 
 -- | Paste view styles.
@@ -153,7 +153,7 @@ paste = do
     listStyle "none"
     lineHeight "1.5em"
     
-    subRule "strong" $ do
+    rule "strong" $ do
       fontWeight "normal"
       width "8em"
       display "block"
@@ -179,10 +179,10 @@ highlighter = do
     tokens
     lineNumbers
 
-    subRule "pre" $ do
+    rule "pre" $ do
       margin "0"
 
-    subRule "td" $ do
+    rule "td" $ do
       verticalAlign "top"
 
 -- | Style for diff groups.
@@ -199,7 +199,7 @@ diff = do
 -- | Tokens colours and styles.
 tokens :: CSS (Either Property Rule)
 tokens = do
-  subRule "pre" $ do
+  rule "pre" $ do
     marginTop "0"
     tokenColor "comment" "#555"
     tokenColor "keyword" "#397460"
@@ -207,18 +207,40 @@ tokens = do
     tokenColor "conid" "#4F4371"
     tokenColor "varop" "#333"
     tokenColor "varid" "#333"
-    
-  where token name props = subRule (".hs-" ++ name) $ props
+  rule "pre" $ do
+    rule ".diff" $ do
+      color "#555"
+    rule "code" $ do
+      jcolor "title" "#333"
+      jcolor "string" "#366354"
+      jcolor "built_in" "#397460"
+      jcolor "preprocessor" "#4F4371"
+      jcolor "comment" "#555"
+      jcolor "command" "#397460"
+      jcolor "special" "#333"
+      jcolor "formula" "#4F4371"
+      jcolor "keyword" "#397460"
+      jcolor "number" "#4F4371"
+      rule ".header" $ do
+        color "#555"
+      rule ".addition" $ do
+        backgroundColor "#FDD"
+        color "#695B5B"
+      rule ".deletion" $ do
+        backgroundColor "#DFD"
+        color "#000"
+  where token name props = rule (".hs-" ++ name) $ props
         tokenColor name col = token name $ color col
+        jcolor name col = rule ("." ++ name) $ color col
 
 -- | The line number part.
 lineNumbers :: CSS (Either Property Rule)
 lineNumbers = do
-  subRule ".linenodiv" $ do
+  rule ".linenodiv" $ do
     margin "0 1em 0 0"
     textAlign "right"
 
-    subRule "a" $ do
+    rule "a" $ do
       textDecoration "none"
       color "#555"
 
@@ -231,7 +253,7 @@ home = do
   classRule "latest-pastes" $ do
     marginTop "0.5em"
   
-  where wrap = subRule ".amelie-wrap" $ do
+  where wrap = rule ".amelie-wrap" $ do
                  width "50em"
 
 -- | Browse page styles.
@@ -241,7 +263,7 @@ browse = do
     textAlign "center"
     margin "1em"
 
-    subRule ".amelie-inner" $ do
+    rule ".amelie-inner" $ do
       margin "auto"
       width "15em"
 
@@ -249,7 +271,7 @@ browse = do
 activity :: CSS Rule
 activity = do
   rule "#activity" $ do
-    subRule ".amelie-wrap" $ do
+    rule ".amelie-wrap" $ do
       width "50em"
 
 -- | Hlint hints
