@@ -41,3 +41,4 @@ Executable amelie
                     ,feed          >= 0.3
                     ,download-curl >= 0.1
                     ,Diff          >= 0.1
+                    ,css           >= 0.1

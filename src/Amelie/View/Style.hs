@@ -10,7 +10,7 @@ module Amelie.View.Style
 import Data.Monoid.Operator ((++))
 import Data.Text.Lazy       (Text)
 import Prelude              hiding ((++))
-import Text.CSS
+import Language.CSS
 
 -- | Side-wide style sheet.
 style :: Text
