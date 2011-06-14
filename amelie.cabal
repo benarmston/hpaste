@@ -42,3 +42,4 @@ Executable amelie
                     ,download-curl >= 0.1
                     ,Diff          >= 0.1
                     ,css           >= 0.1
+                    ,named-formlet >= 0.1
