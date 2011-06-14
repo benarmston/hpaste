@@ -25,6 +25,7 @@ import Data.Text.Lazy             (Text,toStrict)
 import Database.PostgreSQL.Simple (Pool,withPoolConnection)
 import Safe                       (readMay)
 import Snap.Types                 (Snap,writeText,redirect,getParam)
+import Snap.Types                 (modifyResponse,setContentType)
 import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)
 
@@ -33,6 +34,8 @@ runHandler :: Config -> Pool -> Cache -> Chan Text -> Controller () -> Snap ()
 runHandler conf pool cache anns ctrl = do
   withPoolConnection pool $ \conn -> do
     let state = ControllerState conf conn cache anns
+    -- Default to HTML, can be overridden.
+    modifyResponse $ setContentType "text/html"
     runReaderT (runController ctrl) state 
 
 -- | Strictly renders HTML to Text before outputting it via Snap.
