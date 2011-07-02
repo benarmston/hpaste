@@ -43,3 +43,5 @@ Executable amelie
                     ,Diff          >= 0.1
                     ,css           >= 0.1
                     ,named-formlet >= 0.1
+                    ,stepeval      >= 0.2
+                    ,haskell-src-exts >= 1.10

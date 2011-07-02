@@ -127,7 +127,7 @@ viewPaste pastes chans langs (paste@Paste{..},hints) = do
 pasteDetails :: [Paste] -> [Channel] -> [Language] -> Paste -> Html
 pasteDetails pastes chans langs paste@Paste{..} =
   darkNoTitleSection $ do
-    pasteNav pastes paste
+    pasteNav langs pastes paste
     h2 $ toHtml $ fromStrict pasteTitle
     ul ! aClass "paste-specs" $ do
       detail "Paste" $ pasteLink paste $ "#" ++ show pasteId
@@ -142,10 +142,11 @@ pasteDetails pastes chans langs paste@Paste{..} =
             li $ do strong (title ++ ":"); toHtml content
 
 -- | Individual paste navigation.
-pasteNav :: [Paste] -> Paste -> Html
-pasteNav pastes paste =
+pasteNav :: [Language] -> [Paste] -> Paste -> Html
+pasteNav langs pastes paste =
   H.div ! aClass "paste-nav" $ do
     diffLink
+    stepsLink
     href ("/edit/" ++ pack (show pid) ++ "") ("Annotate" :: Text)
     
     where pid = pasteId paste
@@ -158,6 +159,13 @@ pasteNav pastes paste =
                 href ("/diff/" ++ show prevId ++ "/" ++ show pid)
                      ("Diff" :: Text)
                 " - "
+          stepsLink
+            | lang == Just "haskell" = do href ("/steps/" ++ show pid)
+                                               ("Steps" :: Text)
+                                          " - "
+            | otherwise = return ()
+          lang = pasteLanguage paste >>= (`lookup` ls)
+          ls = map (languageId &&& languageName) langs
 
 -- | Show the paste content with highlighting.
 pasteContent :: [Language] -> Paste -> Html

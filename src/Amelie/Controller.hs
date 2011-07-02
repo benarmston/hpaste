@@ -10,6 +10,7 @@ module Amelie.Controller
   ,goHome
   ,justOrGoHome
   ,getInteger
+  ,getString
   ,getPagination)
   where
 
@@ -64,6 +65,12 @@ justOrGoHome x m = maybe goHome m x
 getInteger :: ByteString -> Integer -> Controller Integer
 getInteger name def = do
   pid <- (>>= readMay . toString) <$> getParam name
+  maybe (return def) return pid
+
+-- | Get string.
+getString :: ByteString -> String -> Controller String
+getString name def = do
+  pid <- (>>= return . toString) <$> getParam name
   maybe (return def) return pid
 
 -- | Get pagination data.

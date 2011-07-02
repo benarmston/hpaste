@@ -11,7 +11,8 @@ module Amelie.Types
        ,module Amelie.Types.Newtypes
        ,module Amelie.Types.View
        ,module Amelie.Types.Config
-       ,module Amelie.Types.Activity)
+       ,module Amelie.Types.Activity
+       ,module Amelie.Types.Stepeval)
        where
 
 import Amelie.Types.MVC
@@ -23,3 +24,4 @@ import Amelie.Types.Newtypes
 import Amelie.Types.View
 import Amelie.Types.Config
 import Amelie.Types.Activity
+import Amelie.Types.Stepeval

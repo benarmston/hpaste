@@ -5,7 +5,8 @@
 -- | Show hlint suggestions.
 
 module Amelie.View.Hlint
- (viewHints)
+ (viewHints
+ ,viewSuggestions)
   where
 
 import Amelie.Types
@@ -28,3 +29,8 @@ viewHints = mapM_ showHint where
                       Error   -> errorNoTitleSection
           lns = lines $ clean $ hintContent hint
           clean = dropWhile (==':') . dropWhile (/=':')
+
+viewSuggestions :: [Suggestion] -> Html
+viewSuggestions = viewHints . map toHint where
+  toHint s = Hint (suggestionSeverity s)
+                  (show s)

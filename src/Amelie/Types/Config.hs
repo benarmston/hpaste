@@ -9,11 +9,12 @@ import Database.PostgreSQL.Simple (ConnectInfo)
 
 -- | Site-wide configuration.
 data Config = Config {
-    configAnnounce :: Announcer
-  , configPostgres :: ConnectInfo
-  , configDomain   :: String
-  , configCommits  :: String
-  , configRepoURL  :: String
+    configAnnounce        :: Announcer
+  , configPostgres        :: ConnectInfo
+  , configDomain          :: String
+  , configCommits         :: String
+  , configRepoURL         :: String
+  , configStepevalPrelude :: FilePath
   } deriving (Show)
 
 -- | Announcer configuration.

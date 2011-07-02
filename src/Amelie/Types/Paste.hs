@@ -9,7 +9,9 @@ module Amelie.Types.Paste
        (Paste(..)
        ,PasteSubmit(..)
        ,PasteFormlet(..)
+       ,ExprFormlet(..)
        ,PastePage(..)
+       ,StepsPage(..)
        ,Hint(..))
        where
 
@@ -27,6 +29,7 @@ import Database.PostgreSQL.Simple.Result       (Result(..))
 import Language.Haskell.HLint                  (Severity)
 import Snap.Types                              (Params)
 import Text.Blaze                              (ToHtml(..),toHtml)
+import Text.Blaze.Html5                        (Html)
 
 -- | A paste.
 data Paste = Paste {
@@ -80,6 +83,11 @@ data PasteFormlet = PasteFormlet {
  , pfEditPaste :: Maybe Paste
 }
 
+data ExprFormlet = ExprFormlet {
+   efSubmitted :: Bool
+ , efParams    :: Params
+}
+
 data PastePage = PastePage {
     ppPaste           :: Paste
   , ppChans           :: [Channel]
@@ -87,6 +95,17 @@ data PastePage = PastePage {
   , ppHints           :: [Hint]
   , ppAnnotations     :: [Paste]
   , ppAnnotationHints :: [[Hint]]
+}
+
+data StepsPage = StepsPage {
+    spPaste           :: Paste
+  , spChans           :: [Channel]
+  , spLangs           :: [Language]
+  , spHints           :: [Hint]
+  , spSteps           :: [Text]
+  , spAnnotations     :: [Paste]
+  , spAnnotationHints :: [[Hint]]
+  , spForm :: Html
 }
 
 instance Param Severity where

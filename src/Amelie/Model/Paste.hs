@@ -1,4 +1,4 @@
-{-# OPTIONS -Wall #-}
+{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -14,6 +14,8 @@ module Amelie.Model.Paste
   ,getAnnotations
   ,getSomePastes
   ,countPublicPastes
+  ,generateHints
+  ,generateSteps
   ,getHints)
   where
 
@@ -21,19 +23,22 @@ import Amelie.Types
 import Amelie.Model
 import Amelie.Model.Announcer
 
-import Control.Applicative    ((<$>),(<|>))
+import Control.Applicative          ((<$>),(<|>))
+import Control.Exception            (handle,SomeException)
 import Control.Monad
 import Control.Monad.Env
 import Control.Monad.IO
 import Data.Char
-import Data.List              (find,intercalate)
-import Data.Maybe             (fromMaybe,listToMaybe)
-import Data.Monoid.Operator   ((++))
-import Data.Text              (Text,unpack,pack)
-import Data.Text.IO           as T (writeFile)
-import Data.Text.Lazy         (fromStrict)
+import Data.List                    (find,intercalate)
+import Data.Maybe                   (fromMaybe,listToMaybe)
+import Data.Monoid.Operator         ((++))
+import Data.Text                    (Text,unpack,pack)
+import Data.Text.IO                 as T (writeFile)
+import Data.Text.Lazy               (fromStrict)
+import Language.Haskell.Exts
 import Language.Haskell.HLint
-import Prelude                hiding ((++))
+import Language.Haskell.Stepeval
+import Prelude                      hiding ((++))
 import System.Directory
 import System.FilePath
 
@@ -111,7 +116,7 @@ createPaste langs chans ps@PasteSubmit{..} = do
 -- | Create the hints for a paste.
 createHints :: PasteSubmit -> PasteId -> Model ()
 createHints ps pid = do
-  hints <- generateHints ps pid
+  hints <- generateHintsForPaste ps pid
   forM_ hints $ \hint ->
     exec ["INSERT INTO hint"
          ,"(paste,type,content)"
@@ -144,13 +149,42 @@ validNick s = first && all ok s && length s > 0 where
   ok c = isDigit c || isLetter c || elem c "-_/\\;()[]{}?`'"
   first = all (\c -> isDigit c || isLetter c) $ take 1 s
 
+-- | Get the steps.
+generateSteps :: Text -> String -> Model [Text]
+generateSteps mod expr = do
+  prelude <- getPrelude (unpack mod)
+  case parseExp expr of
+    ParseOk e       -> io $ handle (\(x :: SomeException) -> return (err x)) $ do
+      let steps = map format $ take 50 $ itereval prelude e
+          !_ = length $ show $ concat steps
+      return $ map pack steps
+    ParseFailed _ g -> return ["Error: " ++ pack g]
+
+  where format = prettyPrint
+        err e = ["Error: " ++ pack (show e)]
+
+-- | Get the stepeval prelude.
+getPrelude :: String -> Model [Decl]
+getPrelude extra = do
+  c <- env modelStateConfig
+  io $ handle (\e -> return [] `const` (e :: SomeException)) $ do
+    result <- readFile (configStepevalPrelude c)
+    case parseModule (result ++ "\n\n" ++ extra) of
+      ParseOk (Module _ _ _ _ _ _ ds) -> return ds
+      _                               -> return []
+
 -- | Get hints for a Haskell paste from hlint.
-generateHints :: PasteSubmit -> PasteId -> Model [Suggestion]
-generateHints  PasteSubmit{..} (fromIntegral -> pid :: Integer) = io $ do
+generateHintsForPaste :: PasteSubmit -> PasteId -> Model [Suggestion]
+generateHintsForPaste PasteSubmit{..} (fromIntegral -> pid :: Integer) =
+  generateHints (show pid) pasteSubmitPaste
+
+-- | Get hints for a Haskell paste from hlint.
+generateHints :: FilePath -> Text -> Model [Suggestion]
+generateHints pid contents = io $ do
   tmpdir <- getTemporaryDirectory
-  let tmp = tmpdir </> show pid ++ ".hs"
+  let tmp = tmpdir </> pid ++ ".hs"
   exists <- doesFileExist tmp
-  unless exists $ T.writeFile tmp $ pasteSubmitPaste
+  unless exists $ T.writeFile tmp $ contents
   hints <- hlint [tmp,"--quiet","--ignore=Parse error"]
   return hints
 

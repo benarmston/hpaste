@@ -16,6 +16,8 @@ import Amelie.Controller.New      as New
 import Amelie.Controller.Paste    as Paste
 import Amelie.Controller.Raw      as Raw
 import Amelie.Controller.Script   as Script
+import Amelie.Controller.Stepeval as Stepeval
+import Amelie.Controller.Steps    as Steps
 import Amelie.Controller.Style    as Style
 import Amelie.Model.Announcer     (newAnnouncer)
 import Amelie.Types
@@ -49,8 +51,10 @@ serve conf p cache ans = route routes where
            ,("/js/amelie.js", run Script.handle)
            ,("/css/",serveDirectory "wwwroot/css")
            ,("/js/",serveDirectory "wwwroot/js")
+           ,("/hs/",serveDirectory "wwwroot/hs")
            ,("",run Home.handle)
            ,("/:id",run Paste.handle)
+           ,("/steps/:id",run Steps.handle)
            ,("/raw/:id",run Raw.handle)
            ,("/new",run New.handle)
            ,("/edit/:id",run New.handle)
@@ -60,5 +64,7 @@ serve conf p cache ans = route routes where
            ,("/browse",run Browse.handle)
            ,("/activity",run Activity.handle)
            ,("/diff/:this/:that",run Diff.handle)
+           ,("/stepeval/raw",run Stepeval.handleRaw)
+           ,("/stepeval",run Stepeval.handle)
            ]
   run = runHandler conf p cache ans

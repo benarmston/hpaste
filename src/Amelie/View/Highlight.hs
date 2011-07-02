@@ -5,14 +5,15 @@
 -- | Code highlighting.
 
 module Amelie.View.Highlight
- (highlightPaste)
+ (highlightPaste
+ ,highlightHaskell)
   where
 
 import Amelie.Types
 import Amelie.View.Html
 
 import Data.List                     (find)
-import Data.Text                     (unpack)
+import Data.Text                     (Text,unpack)
 import Language.Haskell.HsColour.CSS (hscolour)
 import Prelude                       hiding ((++))
 import Text.Blaze.Html5              as H hiding (map)
@@ -25,6 +26,11 @@ highlightPaste langs Paste{..} =
       case lang of
         Just (Language{languageName="haskell"}) ->
           preEscapedString $ hscolour False (unpack pastePaste)
-        _ -> pre $ code $ toHtml pastePaste
+        _ -> pre $ toHtml pastePaste
 
   where lang = find ((==pasteLanguage) . Just . languageId) langs
+
+highlightHaskell :: Text -> Html
+highlightHaskell paste =
+  H.table ! aClass "code" $
+    td $ preEscapedString $ hscolour False (unpack paste)

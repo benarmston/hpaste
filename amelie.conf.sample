@@ -10,3 +10,13 @@ user = hpaste
 pass = <YOURPASS>
 host = 127.0.0.1
 port = 6667
+
+[WEB]
+domain = hpaste:10000
+
+[DEV]
+commits = https://github.com/chrisdone/amelie/commits/master.atom
+repo_url = https://github.com/chrisdone/amelie
+
+[STEPEVAL]
+prelude = wwwroot/hs/stepeval-prelude.hs

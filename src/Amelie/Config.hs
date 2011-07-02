@@ -28,6 +28,9 @@ getConfig conf = do
         [commits,url]
           <- mapM (get c "DEV")
                   ["commits","repo_url"]
+        [prelude]
+          <- mapM (get c "STEPEVAL")
+                  ["prelude"]
                   
         return Config {
            configAnnounce = Announcer user pass host (read port)
@@ -35,6 +38,7 @@ getConfig conf = do
          , configDomain = domain
          , configCommits = commits
          , configRepoURL = url
+         , configStepevalPrelude = prelude
          }
   case config of
     Left cperr -> error $ show cperr

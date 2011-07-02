@@ -175,6 +175,11 @@ classRule = rule . (".amelie-" ++)
 highlighter :: CSS Rule
 highlighter = do
   diff
+  classRule "steps" $ do
+    marginTop "1em"
+  classRule "steps-expr" $ do
+    rule ".text" $ do
+      width "300px"
   classRule "code" $ do
     tokens
     lineNumbers
@@ -207,6 +212,7 @@ tokens = do
     tokenColor "conid" "#4F4371"
     tokenColor "varop" "#333"
     tokenColor "varid" "#333"
+    tokenColor "num" "#4F4371"
   rule "pre" $ do
     rule ".diff" $ do
       color "#555"
