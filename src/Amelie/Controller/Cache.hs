@@ -26,10 +26,13 @@ newCache = do
   var <- newMVar M.empty
   return $ Cache var
 
+cache :: Key -> Controller (Maybe Html) -> Controller (Maybe Text)
+cache _key generate = fmap (fmap renderHtml) generate
+
 -- | Generate and save into the cache, or retrieve existing from the
 -- | cache.
-cache :: Key -> Controller (Maybe Html) -> Controller (Maybe Text)
-cache key generate = do
+cache' :: Key -> Controller (Maybe Html) -> Controller (Maybe Text)
+cache' key generate = do
   Cache var <- asks controllerStateCache
   mapping <- io $ readMVar var
   case M.lookup key mapping of
