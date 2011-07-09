@@ -180,16 +180,17 @@ highlighter = do
   classRule "steps-expr" $ do
     rule ".text" $ do
       width "300px"
+
   classRule "code" $ do
     tokens
-    lineNumbers
 
     rule "pre" $ do
       margin "0"
 
     rule "td" $ do
       verticalAlign "top"
-
+  lineNumbers
+  
 -- | Style for diff groups.
 diff :: CSS Rule
 diff = do
@@ -240,15 +241,17 @@ tokens = do
         jcolor name col = rule ("." ++ name) $ color col
 
 -- | The line number part.
-lineNumbers :: CSS (Either Property Rule)
+lineNumbers :: CSS Rule
 lineNumbers = do
-  rule ".linenodiv" $ do
+  rule ".amelie-line-nums pre" $ do
     margin "0 1em 0 0"
     textAlign "right"
-
     rule "a" $ do
       textDecoration "none"
       color "#555"
+    rule "a:target" $ do
+      textDecoration "underline"
+      color "#000"
 
 -- | Home page styles.
 home :: CSS Rule
