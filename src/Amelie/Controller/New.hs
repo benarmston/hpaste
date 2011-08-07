@@ -20,6 +20,17 @@ import Control.Applicative
 import Data.Text.Encoding      (decodeUtf8)
 import Snap.Types
 
+-- @ label annotatePage
+-- @ do Annotate a paste.
+-- @ trigger getPasteById
+-- @ trigger updatePaste
+-- @ next pastePage
+
+-- @ label newPastePage
+-- @ do Create a new paste.
+-- @ trigger createPaste
+-- @ next pastePage
+
 handle :: Controller ()
 handle = do
   chans <- model $ getChannels

@@ -28,6 +28,9 @@ import Control.Applicative
 import Data.Text               (unpack)
 import Text.Blaze.Html5        as H hiding (output)
 
+-- @ label stepsPage
+-- @ do Show code steps.
+-- @ trigger getPasteById
 -- | Handle the paste page.
 handle :: Controller ()
 handle = do

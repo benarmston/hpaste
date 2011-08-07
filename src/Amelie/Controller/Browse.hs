@@ -14,6 +14,11 @@ import Amelie.Model.Language (getLanguages)
 import Amelie.Model.Paste    (getSomePastes,countPublicPastes)
 import Amelie.View.Browse    (page)
 
+-- @ label browsePage
+-- @ do Browse pastes.
+-- @ trigger getPastes
+-- @ next pastePage
+-- @ next browsePage
 handle :: Controller ()
 handle = do
   pn <- getPagination

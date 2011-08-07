@@ -32,39 +32,74 @@ import Data.Text.Lazy             (Text)
 import Database.PostgreSQL.Simple (Pool,newPool)
 import System.Environment
 
+-- @ label main
+-- @ do Main entry point.
+-- @ trigger readConfig
+-- @ trigger connectToIRC
+-- @ trigger createConnectionPool
+-- @ next server
 -- | Main entry point.
 main :: IO ()
 main = do
   cpath:_ <- getArgs
+  -- @ label readConfig
+  -- @ task Read config file.
   config <- getConfig cpath
+  -- @ label connectToIRC
+  -- @ task Connect to IRC.
   announces <- newAnnouncer (configAnnounce config)
+  -- @ label createConnectionPool
+  -- @ task Create connection pool.
   pool <- newPool (configPostgres config)
   cache <- newCache
   setUnicodeLocale "en_US"
   httpServe server (serve config pool cache announces)
  where server = addListen (ListenHttp "0.0.0.0" 10000) defaultConfig
 
+-- @ label server
+-- @ do Web server.
+-- @ trigger serve
 -- | Serve the controllers.
 serve :: Config -> Pool -> Cache -> Chan Text -> Snap ()
 serve conf p cache ans = route routes where
-  routes = [("/css/amelie.css", run Style.handle)
+  -- @ label serve
+  -- @ if Static?
+  -- @ then staticServe
+  -- @ else pageServe
+  routes = [
+            -- @ label staticServe
+            -- @ do Serve static content.
+            ("/css/amelie.css", run Style.handle)
            ,("/js/amelie.js", run Script.handle)
            ,("/css/",serveDirectory "wwwroot/css")
            ,("/js/",serveDirectory "wwwroot/js")
            ,("/hs/",serveDirectory "wwwroot/hs")
+            -- @ label pageServe
+            -- @ do Serve page.
            ,("",run Home.handle)
+            -- @ next homePage
            ,("/:id",run Paste.handle)
+            -- @ next pastePage
            ,("/steps/:id",run Steps.handle)
+            -- @ next stepsPage
            ,("/raw/:id",run Raw.handle)
+            -- @ next rawPastePage
            ,("/new",run New.handle)
+            -- @ next newPastePage
            ,("/edit/:id",run New.handle)
+            -- @ next annotatePage
            ,("/new/:channel",run New.handle)
+            -- @ next browsePage
            ,("/browse/page/:page/offset/:offset",run Browse.handle)
            ,("/browse/page/:page",run Browse.handle)
            ,("/browse",run Browse.handle)
+            -- @ next activityPage
            ,("/activity",run Activity.handle)
+            -- @ next diffPage
            ,("/diff/:this/:that",run Diff.handle)
+            -- @ next stepEvalRawPage
            ,("/stepeval/raw",run Stepeval.handleRaw)
+            -- @ next stepEvalPage
            ,("/stepeval",run Stepeval.handle)
            ]
   run = runHandler conf p cache ans

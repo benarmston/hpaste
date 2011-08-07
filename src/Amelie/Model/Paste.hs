@@ -49,6 +49,8 @@ countPublicPastes = do
                          ,"FROM public_toplevel_paste"]
   return $ fromMaybe 0 rows
 
+-- @ label getLatestPastes
+-- @ task Get latest pastes.
 -- | Get the latest pastes.
 getLatestPastes :: Model [Paste]
 getLatestPastes =
@@ -57,7 +59,9 @@ getLatestPastes =
                 ,"ORDER BY id DESC"
                 ,"LIMIT 20"]
 
--- | Get the latest pastes.
+-- @ label getPastes
+-- @ task Get some pastes.
+-- | Get some paginated pastes.
 getSomePastes :: Pagination -> Model [Paste]
 getSomePastes Pagination{..} =
   queryNoParams ["SELECT *"
@@ -66,6 +70,8 @@ getSomePastes Pagination{..} =
                 ,"OFFSET " ++ show (max 0 (pnPage - 1) * pnLimit)
                 ,"LIMIT " ++ show pnLimit]
 
+-- @ label getPasteById
+-- @ task Get paste by id.
 -- | Get a paste by its id.
 getPasteById :: PasteId -> Model (Maybe Paste)
 getPasteById pid =
@@ -91,6 +97,8 @@ createOrEdit langs chans paste@PasteSubmit{..} = do
     Just pid -> do updatePaste pid paste
                    return $ Just pid
 
+-- @ label createPaste
+-- @ task Create paste.
 -- | Create a new paste (possibly editing an existing one).
 createPaste :: [Language] -> [Channel] -> PasteSubmit -> Model (Maybe PasteId)
 createPaste langs chans ps@PasteSubmit{..} = do
@@ -195,6 +203,8 @@ getHints pid =
         ,"WHERE paste = ?"]
         (Only pid)
 
+-- @ label updatePaste
+-- @ task Update paste.
 -- | Update an existing paste.
 updatePaste :: PasteId -> PasteSubmit -> Model ()
 updatePaste pid PasteSubmit{..} = do

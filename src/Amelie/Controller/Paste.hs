@@ -37,6 +37,11 @@ import Snap.Types
 import Text.Blaze.Html5        as H hiding (output)
 import Text.Formlet
 
+-- @ label pastePage
+-- @ do Paste page.
+-- @ trigger getPasteById
+-- @ next annotatePage
+-- @ next stepsPage
 -- | Handle the paste page.
 handle :: Controller ()
 handle = do

@@ -23,6 +23,8 @@ import           Data.Text.Lazy       (fromStrict)
 import           Prelude              hiding ((++))
 import           Snap.Types
 
+-- @ label stepEvalPage
+-- @ do Stepeval info page.
 -- | Handle the stepeval explanation page.
 handle :: Controller ()
 handle = do
@@ -34,6 +36,8 @@ handle = do
   , sePaste = contents
   }
 
+-- @ label stepEvalRawPage
+-- @ do Stepeval raw Prelude page.
 -- | Handle the raw stepeval Prelude view.
 handleRaw :: Controller ()
 handleRaw = do

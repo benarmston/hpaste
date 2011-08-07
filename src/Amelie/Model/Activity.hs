@@ -18,6 +18,8 @@ import Network.Curl.Download
 import System.Locale
 import Text.Feed.Query
 
+-- @ label getCommits
+-- @ task Get commits from feed.
 -- | Get commits of this project from a commit feed.
 getCommits :: String -> Model [Commit]
 getCommits uri = io $ do
