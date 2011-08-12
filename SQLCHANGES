@@ -1,3 +1,7 @@
 CREATE TABLE hint (id serial primary key, paste integer references
 paste(id) on delete cascade on update cascade, type text not null,
 content text not null);
+
+create table report (id serial primary key, paste integer not null
+references paste(id) on delete cascade on update cascade, comments
+text not null);

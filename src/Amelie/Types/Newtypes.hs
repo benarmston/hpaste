@@ -6,7 +6,8 @@
 module Amelie.Types.Newtypes
        (PasteId(..)
        ,ChannelId(..)
-       ,LanguageId(..))
+       ,LanguageId(..)
+       ,ReportId(..))
        where
 
 import Database.PostgreSQL.Simple.Result (Result)
@@ -16,6 +17,11 @@ newtype PasteId = PasteId Integer
   deriving (Integral,Real,Num,Ord,Eq,Enum,Result,Param)
 
 instance Show PasteId where show (PasteId pid) = show pid
+
+newtype ReportId = ReportId Integer
+  deriving (Integral,Real,Num,Ord,Eq,Enum,Result,Param)
+
+instance Show ReportId where show (ReportId pid) = show pid
 
 newtype ChannelId = ChannelId Integer
   deriving (Integral,Real,Num,Ord,Eq,Enum,Result,Param)

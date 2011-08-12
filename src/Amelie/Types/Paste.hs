@@ -12,7 +12,9 @@ module Amelie.Types.Paste
        ,ExprFormlet(..)
        ,PastePage(..)
        ,StepsPage(..)
-       ,Hint(..))
+       ,Hint(..)
+       ,ReportFormlet(..)
+       ,ReportSubmit(..))
        where
 
 import Amelie.Types.Newtypes
@@ -128,3 +130,13 @@ instance QueryResults Hint where
     , hintContent = content
     }
     where (severity,content) = convertResults field values
+
+data ReportFormlet = ReportFormlet {
+   rfSubmitted :: Bool
+ , rfParams    :: Params
+}
+
+data ReportSubmit = ReportSubmit {
+   rsPaste :: PasteId
+  ,rsComments :: String
+}

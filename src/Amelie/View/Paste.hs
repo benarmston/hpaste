@@ -1,4 +1,4 @@
-{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
+{-# OPTIONS -Wall -fno-warn-name-shadowing -fno-warn-unused-do-bind #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -148,6 +148,8 @@ pasteNav langs pastes paste =
     diffLink
     stepsLink
     href ("/edit/" ++ pack (show pid) ++ "") ("Annotate" :: Text)
+    " - "
+    href ("/report/" ++ pack (show pid) ++ "") ("Report/Delete" :: Text)
     
     where pid = pasteId paste
           pairs = zip (drop 1 pastes) pastes

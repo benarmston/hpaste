@@ -11,7 +11,6 @@ module Amelie.Controller.Cache
 import           Amelie.Types
 import           Amelie.Types.Cache
 
-import           Control.Applicative      ((<$>))
 import           Control.Concurrent
 import           Control.Monad.IO         (io)
 import           Control.Monad.Reader     (asks)
@@ -29,20 +28,20 @@ newCache = do
 cache :: Key -> Controller (Maybe Html) -> Controller (Maybe Text)
 cache _key generate = fmap (fmap renderHtml) generate
 
--- | Generate and save into the cache, or retrieve existing from the
--- | cache.
-cache' :: Key -> Controller (Maybe Html) -> Controller (Maybe Text)
-cache' key generate = do
-  Cache var <- asks controllerStateCache
-  mapping <- io $ readMVar var
-  case M.lookup key mapping of
-    Just html -> return $ Just html
-    Nothing   -> do
-      html <- fmap renderHtml <$> generate
-      case html of
-        Just html -> io $ modifyMVar_ var (return . M.insert key html)
-        Nothing   -> return ()
-      return $ html
+-- -- | Generate and save into the cache, or retrieve existing from the
+-- -- | cache.
+-- cache' :: Key -> Controller (Maybe Html) -> Controller (Maybe Text)
+-- cache' key generate = do
+--   Cache var <- asks controllerStateCache
+--   mapping <- io $ readMVar var
+--   case M.lookup key mapping of
+--     Just html -> return $ Just html
+--     Nothing   -> do
+--       html <- fmap renderHtml <$> generate
+--       case html of
+--         Just html -> io $ modifyMVar_ var (return . M.insert key html)
+--         Nothing   -> return ()
+--       return $ html
 
 -- | Reset an item in the cache.
 resetCache :: Key -> Controller ()

@@ -9,7 +9,6 @@ module Amelie.Controller.Steps
   where
 
 import Amelie.Types
-
 import Amelie.Controller
 import Amelie.Controller.Paste (getPasteId)
 import Amelie.Controller.Cache (cache)
