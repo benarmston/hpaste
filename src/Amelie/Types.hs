@@ -12,7 +12,8 @@ module Amelie.Types
        ,module Amelie.Types.View
        ,module Amelie.Types.Config
        ,module Amelie.Types.Activity
-       ,module Amelie.Types.Stepeval)
+       ,module Amelie.Types.Stepeval
+       ,module Amelie.Types.Report)
        where
 
 import Amelie.Types.MVC
@@ -25,4 +26,4 @@ import Amelie.Types.View
 import Amelie.Types.Config
 import Amelie.Types.Activity
 import Amelie.Types.Stepeval
-
+import Amelie.Types.Report

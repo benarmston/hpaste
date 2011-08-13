@@ -7,24 +7,34 @@
 -- | Report model.
 
 module Amelie.Model.Report
-  (getReports,createReport)
+  (getSomeReports,createReport,countReports)
   where
 
 import Amelie.Types
 import Amelie.Model
 
 import Control.Monad
-import Prelude                      hiding ((++))
+import Data.Maybe
+import Data.Monoid.Operator ((++))
+import Prelude              hiding ((++))
 
 -- @ label getReports
--- @ task Get reports.
--- | Get the reports.
-getReports :: Model [Paste]
-getReports =
-  queryNoParams ["SELECT *"
+-- @ task Get some reports.
+-- | Get some paginated reports.
+getSomeReports :: Pagination -> Model [Report]
+getSomeReports Pagination{..} =
+  queryNoParams ["SELECT created,paste,comments"
                 ,"FROM report"
                 ,"ORDER BY id DESC"
-                ,"LIMIT 20"]
+                ,"OFFSET " ++ show (max 0 (pnPage - 1) * pnLimit)
+                ,"LIMIT " ++ show pnLimit]
+
+-- | Count reports.
+countReports :: Model Integer
+countReports = do
+  rows <- singleNoParams ["SELECT COUNT(*)"
+                         ,"FROM report"]
+  return $ fromMaybe 0 rows
 
 -- @ label createReport
 -- @ task Create report.

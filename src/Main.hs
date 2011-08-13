@@ -16,6 +16,7 @@ import Amelie.Controller.New      as New
 import Amelie.Controller.Paste    as Paste
 import Amelie.Controller.Raw      as Raw
 import Amelie.Controller.Report   as Report
+import Amelie.Controller.Reported as Reported
 import Amelie.Controller.Script   as Script
 import Amelie.Controller.Stepeval as Stepeval
 import Amelie.Controller.Steps    as Steps
@@ -86,6 +87,7 @@ serve conf p cache ans = route routes where
            ,("/raw/:id",run Raw.handle)
             -- @ next rawPastePage
            ,("/report/:id",run Report.handle)
+           ,("/reported",run Reported.handle)
             -- @ next reportPastePage
            ,("/new",run New.handle)
             -- @ next newPastePage
