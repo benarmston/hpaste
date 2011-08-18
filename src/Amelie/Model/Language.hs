@@ -16,4 +16,5 @@ getLanguages :: Model [Language]
 getLanguages =
   queryNoParams ["SELECT id,name,title"
                 ,"FROM language"
+                ,"WHERE visible"
                 ,"ORDER BY ordinal,title ASC"]
