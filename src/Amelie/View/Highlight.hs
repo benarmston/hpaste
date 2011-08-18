@@ -36,7 +36,11 @@ highlightPaste langs Paste{..} =
       case lang of
         Just (Language{languageName="haskell"}) ->
           preEscapedString $ hscolour False (unpack pastePaste)
-        _ -> pre $ toHtml pastePaste
+        Just (Language{..}) ->
+          pre $ code ! A.class_ (toValue $ "language-" ++ languageName) $
+            toHtml pastePaste
+        _ ->
+          pre $ toHtml pastePaste
 
   where lang = find ((==pasteLanguage) . Just . languageId) langs
 
