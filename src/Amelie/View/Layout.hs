@@ -15,6 +15,7 @@ import           Data.Monoid.Operator        ((++))
 import           Prelude                     hiding ((++))
 import           Text.Blaze.Html5            as H hiding (map,nav)
 import qualified Text.Blaze.Html5.Attributes as A
+import           Text.Blaze (preEscapedText)
 
 -- | Render the page in a layout.
 layoutPage :: Page -> Html
@@ -29,12 +30,21 @@ layoutPage Page{..} = do
       title $ toHtml $ pageTitle ++ " :: hpaste — Haskell Pastebin"
       script $
         "hljs.tabReplace = '    ';hljs.initHighlightingOnLoad();"
-    body ! A.id (toValue pageName) $
+    body ! A.id (toValue pageName) $ do
       wrap $ do
         nav
         logo
         pageBody
         foot
+      preEscapedText "<script type=\"text/javascript\"> var _gaq = _gaq \
+                     \|| []; _gaq.push(['_setAccount', 'UA-7443395-10']);\
+                     \ _gaq.push(['_trackPageview']); (function() {var ga\
+                     \ = document.createElement('script'); ga.type = 'tex\
+                     \t/javascript'; ga.async = true; ga.src = ('https:' \
+                     \== document.location.protocol ? 'https://ssl' : \
+                     \'http://www') + '.google-analytics.com/ga.js'; var\
+                     \ s = document.getElementsByTagName('script')[0]; \
+                     \s.parentNode.insertBefore(ga, s);})(); </script>"
     
     where js s = script ! A.type_ "text/javascript"
                         ! A.src ("/js/" ++ s) $
