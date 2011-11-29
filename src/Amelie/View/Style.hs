@@ -35,6 +35,10 @@ ircEntries = do
     marginLeft "0"
     paddingLeft "0"
     listStyle "none"
+    rule ".current" $ do
+      fontWeight "bold"
+      marginTop "1em"
+      marginBottom "1em"
 
 -- | Footer.
 footer :: CSS Rule

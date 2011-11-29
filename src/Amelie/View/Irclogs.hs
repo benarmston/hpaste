@@ -25,17 +25,17 @@ import           Text.Blaze.Html5     as H hiding (map)
 import qualified Text.Blaze.Html5.Attributes   as A
 
 -- | Render the irclogs page.
-page :: String -> String -> String -> Either String [Text] -> Html
-page channel date time entries =
+page :: String -> String -> String -> Either String [Text] -> Maybe Integer -> Html
+page channel date time entries pid =
   layoutPage $ Page {
     pageTitle = "Development irclogs"
-  , pageBody = irclogs channel entries
+  , pageBody = irclogs pid channel entries
   , pageName = "irclogs"
   }
 
 -- | View the paginated pastes.
-irclogs :: String -> Either String [Text] -> Html
-irclogs channel entries = do
+irclogs :: Maybe Integer -> String -> Either String [Text] -> Html
+irclogs pid channel entries = do
   darkSection "IRC logs" $ do
     p $ do "Channel: #"; toHtml channel
   lightSection (fromString ("#" ++ channel)) $ do
@@ -46,7 +46,10 @@ irclogs channel entries = do
         ul !. "amelie-irc-entries" $
           forM_ entries $ \entry -> do
             let date = toValue $ parseDate entry
-            li $ do
+                url = "http://hpaste.org/" ++ maybe "0" (T.pack . show) pid
+                currentline | T.isSuffixOf url entry = "current"
+                            | otherwise = ""
+            li !. (toValue (currentline :: Text)) $ do
               a ! A.name date ! A.id date $ return ()
               toHtml entry
 
