@@ -12,6 +12,7 @@ import Amelie.Controller.Browse   as Browse
 import Amelie.Controller.Cache    (newCache)
 import Amelie.Controller.Diff     as Diff
 import Amelie.Controller.Home     as Home
+import Amelie.Controller.Irclogs  as Irclogs
 import Amelie.Controller.New      as New
 import Amelie.Controller.Paste    as Paste
 import Amelie.Controller.Raw      as Raw
@@ -76,6 +77,11 @@ serve conf p cache ans = route routes where
            ,("/css/",serveDirectory "wwwroot/css")
            ,("/js/",serveDirectory "wwwroot/js")
            ,("/hs/",serveDirectory "wwwroot/hs")
+           ,("/irc/:channel/:date/:timestamp",run Irclogs.handle)
+           -- /irc/haskell/2011-08-30/00-01-51
+           -- ,("/irc/:channel/:date",run Irclogs.handle)
+           -- ,("/irc/:channel",run Irclogs.handle)
+           -- ,("/irc",run Irclogs.handle)
             -- @ label pageServe
             -- @ do Serve page.
            ,("",run Home.handle)

@@ -15,6 +15,7 @@ data Config = Config {
   , configCommits         :: String
   , configRepoURL         :: String
   , configStepevalPrelude :: FilePath
+  , configIrcDir          :: FilePath
   } deriving (Show)
 
 -- | Announcer configuration.

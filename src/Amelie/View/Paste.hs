@@ -11,6 +11,7 @@ module Amelie.View.Paste
   ,pasteRawLink)
   where
 
+import           Amelie.Model.Irclogs        (showIrcDateTime)
 import           Amelie.Types
 import           Amelie.View.Highlight       (highlightPaste)
 import           Amelie.View.Hlint           (viewHints)
@@ -133,13 +134,23 @@ pasteDetails pastes chans langs paste@Paste{..} =
       detail "Paste" $ pasteLink paste $ "#" ++ show pasteId
       detail "Author" $ pasteAuthor
       detail "Language" $ showLanguage langs pasteLanguage
-      detail "Channel" $ showChannel chans pasteChannel
+      detail "Channel" $ do showChannel chans pasteChannel
+                            showContextLink paste chans pasteChannel
       detail "Created" $ showDateTime pasteDate
       detail "Raw" $ pasteRawLink paste $ ("View raw link" :: Text)
     clear
 
     where detail title content = do
             li $ do strong (title ++ ":"); toHtml content
+
+showContextLink :: Paste -> [Channel] -> Maybe ChannelId -> Html
+showContextLink Paste{..} chans chid =
+  case chid >>= \chid -> find ((==chid).channelId) chans of
+    Nothing -> return ()
+    Just Channel{..} -> do
+      let uri = "/irc/" ++ T.unpack (T.dropWhile (=='#') channelName) ++
+                "/" ++ showIrcDateTime pasteDate
+      href uri ("Context in IRC" :: String)
 
 -- | Individual paste navigation.
 pasteNav :: [Language] -> [Paste] -> Paste -> Html

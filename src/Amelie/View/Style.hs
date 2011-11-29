@@ -26,6 +26,15 @@ style = renderCSS $ runCSS $ do
   browse
   footer
   activity
+  ircEntries
+  
+-- | IRC log entries.
+ircEntries :: CSS Rule
+ircEntries = do
+  classRule "irc-entries" $ do
+    marginLeft "0"
+    paddingLeft "0"
+    listStyle "none"
 
 -- | Footer.
 footer :: CSS Rule

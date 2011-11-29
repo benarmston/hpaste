@@ -31,6 +31,9 @@ getConfig conf = do
         [prelude]
           <- mapM (get c "STEPEVAL")
                   ["prelude"]
+        [ircDir]
+          <- mapM (get c "IRC")
+                  ["log_dir"]
                   
         return Config {
            configAnnounce = Announcer user pass host (read port)
@@ -39,6 +42,7 @@ getConfig conf = do
          , configCommits = commits
          , configRepoURL = url
          , configStepevalPrelude = prelude
+         , configIrcDir = ircDir
          }
   case config of
     Left cperr -> error $ show cperr
