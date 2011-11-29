@@ -135,6 +135,7 @@ pasteDetails pastes chans langs paste@Paste{..} =
       detail "Author" $ pasteAuthor
       detail "Language" $ showLanguage langs pasteLanguage
       detail "Channel" $ do showChannel chans pasteChannel
+                            " "
                             showContextLink paste chans pasteChannel
       detail "Created" $ showDateTime pasteDate
       detail "Raw" $ pasteRawLink paste $ ("View raw link" :: Text)

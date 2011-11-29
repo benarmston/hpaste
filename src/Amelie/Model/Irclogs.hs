@@ -102,4 +102,4 @@ showIrcDate = formatTime defaultTimeLocale "%Y-%m-%d"
 -- | Show a date to an IRC date format.
 showIrcDateTime :: UTCTime -> String
 showIrcDateTime =
-  formatTime defaultTimeLocale "%Y-%m-%d/%H/%M/%S" . addUTCTime ((-8)*60*60)
+  formatTime defaultTimeLocale "%Y-%m-%d/%H-%M-%S" . addUTCTime ((-8)*60*60)
