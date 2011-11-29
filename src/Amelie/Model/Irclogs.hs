@@ -8,21 +8,21 @@ import           Control.Applicative
 import           Control.Arrow
 import           Control.Monad.IO
 import           Control.Monad.Reader
-import           Data.ByteString       (ByteString)
-import qualified Data.ByteString       as S
+import           Data.ByteString          (ByteString)
+import qualified Data.ByteString          as S
 import           Data.Char
 import           Data.Either
-import           Data.List             (find)
+import           Data.List                (find)
 import           Data.List.Utils
 import           Data.Maybe
-import           Data.Monoid.Operator  ((++))
-import           Data.Text             (Text)
-import qualified Data.Text             as T
+import           Data.Monoid.Operator     ((++))
+import           Data.Text                (Text)
+import qualified Data.Text                as T
 import           Data.Text.Encoding
+import           Data.Text.Encoding.Error (lenientDecode)
 import           Data.Time
-import           Data.Time.Calendar
 import           Network.Curl.Download
-import           Prelude               hiding ((++))
+import           Prelude                  hiding ((++))
 import           System.Directory
 import           System.FilePath
 import           System.Locale
@@ -72,7 +72,7 @@ getLogs channel year = do
     result <- openURICached (year == now) (file dir) uri
     case result of
       Left err    -> return $ Left $ uri ++ ": " ++ err
-      Right bytes -> return $ Right (map addYear (T.lines (decodeASCII bytes)))
+      Right bytes -> return $ Right (map addYear (T.lines (decodeUtf8With lenientDecode bytes)))
 
   where uri = "http://tunes.org/~nef/logs/" ++ channel ++ "/" ++ yearStr
         file dir = dir </> channel ++ "-" ++ yearStr
