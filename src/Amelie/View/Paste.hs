@@ -150,7 +150,7 @@ showContextLink Paste{..} chans chid =
     Nothing -> return ()
     Just Channel{..} -> do
       let uri = "/irc/" ++ T.unpack (T.dropWhile (=='#') channelName) ++
-                "/" ++ showIrcDateTime pasteDate
+                "/" ++ showIrcDateTime pasteDate ++ "/" ++ show pasteId
       href uri ("Context in IRC" :: String)
 
 -- | Individual paste navigation.
