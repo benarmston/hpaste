@@ -69,7 +69,7 @@ getLogs channel year = do
   dir <- asks $ configIrcDir . controllerStateConfig
   io $ do
     now <- fmap (showIrcDate . utctDay) getCurrentTime
-    result <- openURICached (year /= now) (file dir) uri
+    result <- openURICached (year == now) (file dir) uri
     case result of
       Left err    -> return $ Left $ uri ++ ": " ++ err
       Right bytes -> return $ Right (map addYear (T.lines (decodeASCII bytes)))
