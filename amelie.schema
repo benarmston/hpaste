@@ -1,0 +1,372 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: channel; Type: TABLE; Schema: public; Owner: amelie; Tablespace: 
+--
+
+CREATE TABLE channel (
+    id integer NOT NULL,
+    title character varying(28) NOT NULL
+);
+
+
+ALTER TABLE public.channel OWNER TO amelie;
+
+--
+-- Name: channel_id_seq; Type: SEQUENCE; Schema: public; Owner: amelie
+--
+
+CREATE SEQUENCE channel_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.channel_id_seq OWNER TO amelie;
+
+--
+-- Name: channel_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: amelie
+--
+
+ALTER SEQUENCE channel_id_seq OWNED BY channel.id;
+
+
+--
+-- Name: hint; Type: TABLE; Schema: public; Owner: amelie; Tablespace: 
+--
+
+CREATE TABLE hint (
+    id integer NOT NULL,
+    paste integer,
+    type text NOT NULL,
+    content text NOT NULL
+);
+
+
+ALTER TABLE public.hint OWNER TO amelie;
+
+--
+-- Name: hint_id_seq; Type: SEQUENCE; Schema: public; Owner: amelie
+--
+
+CREATE SEQUENCE hint_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.hint_id_seq OWNER TO amelie;
+
+--
+-- Name: hint_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: amelie
+--
+
+ALTER SEQUENCE hint_id_seq OWNED BY hint.id;
+
+
+--
+-- Name: language; Type: TABLE; Schema: public; Owner: amelie; Tablespace: 
+--
+
+CREATE TABLE language (
+    id integer NOT NULL,
+    name character varying(32) NOT NULL,
+    title character varying(64) NOT NULL,
+    ordinal integer DEFAULT 0 NOT NULL,
+    visible boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.language OWNER TO amelie;
+
+--
+-- Name: language_id_seq; Type: SEQUENCE; Schema: public; Owner: amelie
+--
+
+CREATE SEQUENCE language_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.language_id_seq OWNER TO amelie;
+
+--
+-- Name: language_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: amelie
+--
+
+ALTER SEQUENCE language_id_seq OWNED BY language.id;
+
+
+--
+-- Name: paste; Type: TABLE; Schema: public; Owner: amelie; Tablespace: 
+--
+
+CREATE TABLE paste (
+    id integer NOT NULL,
+    title character varying(512) NOT NULL,
+    content text NOT NULL,
+    tags text,
+    author character varying(128) NOT NULL,
+    created timestamp with time zone DEFAULT now() NOT NULL,
+    views integer DEFAULT 0 NOT NULL,
+    language integer,
+    channel integer,
+    annotation_of integer,
+    expire timestamp with time zone,
+    output text,
+    public boolean DEFAULT true
+);
+
+
+ALTER TABLE public.paste OWNER TO amelie;
+
+--
+-- Name: paste_id_seq; Type: SEQUENCE; Schema: public; Owner: amelie
+--
+
+CREATE SEQUENCE paste_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.paste_id_seq OWNER TO amelie;
+
+--
+-- Name: paste_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: amelie
+--
+
+ALTER SEQUENCE paste_id_seq OWNED BY paste.id;
+
+
+--
+-- Name: public_paste; Type: VIEW; Schema: public; Owner: amelie
+--
+
+CREATE VIEW public_paste AS
+    SELECT paste.id, paste.title, paste.content, paste.author, paste.created, paste.views, paste.language, paste.channel, paste.annotation_of FROM paste WHERE paste.public;
+
+
+ALTER TABLE public.public_paste OWNER TO amelie;
+
+--
+-- Name: public_toplevel_paste; Type: VIEW; Schema: public; Owner: amelie
+--
+
+CREATE VIEW public_toplevel_paste AS
+    SELECT public_paste.id, public_paste.title, public_paste.content, public_paste.author, public_paste.created, public_paste.views, public_paste.language, public_paste.channel, public_paste.annotation_of FROM public_paste WHERE (public_paste.annotation_of IS NULL);
+
+
+ALTER TABLE public.public_toplevel_paste OWNER TO amelie;
+
+--
+-- Name: report; Type: TABLE; Schema: public; Owner: amelie; Tablespace: 
+--
+
+CREATE TABLE report (
+    id integer NOT NULL,
+    paste integer NOT NULL,
+    comments text NOT NULL,
+    created timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.report OWNER TO amelie;
+
+--
+-- Name: report_id_seq; Type: SEQUENCE; Schema: public; Owner: amelie
+--
+
+CREATE SEQUENCE report_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.report_id_seq OWNER TO amelie;
+
+--
+-- Name: report_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: amelie
+--
+
+ALTER SEQUENCE report_id_seq OWNED BY report.id;
+
+
+--
+-- Name: step; Type: TABLE; Schema: public; Owner: amelie; Tablespace: 
+--
+
+CREATE TABLE step (
+    paste integer NOT NULL,
+    step integer NOT NULL,
+    content text NOT NULL
+);
+
+
+ALTER TABLE public.step OWNER TO amelie;
+
+--
+-- Name: toplevel_paste; Type: VIEW; Schema: public; Owner: amelie
+--
+
+CREATE VIEW toplevel_paste AS
+    SELECT paste.id, paste.title, paste.content, paste.tags, paste.author, paste.created, paste.views, paste.language, paste.channel, paste.annotation_of, paste.expire, paste.output, paste.public FROM paste WHERE (paste.annotation_of IS NULL);
+
+
+ALTER TABLE public.toplevel_paste OWNER TO amelie;
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE channel ALTER COLUMN id SET DEFAULT nextval('channel_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE hint ALTER COLUMN id SET DEFAULT nextval('hint_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE language ALTER COLUMN id SET DEFAULT nextval('language_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE paste ALTER COLUMN id SET DEFAULT nextval('paste_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE report ALTER COLUMN id SET DEFAULT nextval('report_id_seq'::regclass);
+
+
+--
+-- Name: channel_pkey; Type: CONSTRAINT; Schema: public; Owner: amelie; Tablespace: 
+--
+
+ALTER TABLE ONLY channel
+    ADD CONSTRAINT channel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hint_pkey; Type: CONSTRAINT; Schema: public; Owner: amelie; Tablespace: 
+--
+
+ALTER TABLE ONLY hint
+    ADD CONSTRAINT hint_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: language_pkey; Type: CONSTRAINT; Schema: public; Owner: amelie; Tablespace: 
+--
+
+ALTER TABLE ONLY language
+    ADD CONSTRAINT language_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: paste_pkey; Type: CONSTRAINT; Schema: public; Owner: amelie; Tablespace: 
+--
+
+ALTER TABLE ONLY paste
+    ADD CONSTRAINT paste_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: report_pkey; Type: CONSTRAINT; Schema: public; Owner: amelie; Tablespace: 
+--
+
+ALTER TABLE ONLY report
+    ADD CONSTRAINT report_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hint_paste_fkey; Type: FK CONSTRAINT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE ONLY hint
+    ADD CONSTRAINT hint_paste_fkey FOREIGN KEY (paste) REFERENCES paste(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: paste_channel_fkey; Type: FK CONSTRAINT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE ONLY paste
+    ADD CONSTRAINT paste_channel_fkey FOREIGN KEY (channel) REFERENCES channel(id);
+
+
+--
+-- Name: paste_language_fkey; Type: FK CONSTRAINT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE ONLY paste
+    ADD CONSTRAINT paste_language_fkey FOREIGN KEY (language) REFERENCES language(id);
+
+
+--
+-- Name: report_paste_fkey; Type: FK CONSTRAINT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE ONLY report
+    ADD CONSTRAINT report_paste_fkey FOREIGN KEY (paste) REFERENCES paste(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: step_paste_fkey; Type: FK CONSTRAINT; Schema: public; Owner: amelie
+--
+
+ALTER TABLE ONLY step
+    ADD CONSTRAINT step_paste_fkey FOREIGN KEY (paste) REFERENCES paste(id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
