@@ -12,11 +12,7 @@ import Amelie.Model
 import Amelie.Model.Report   (getSomeReports,countReports)
 import Amelie.View.Reported  (page)
 
--- @ label reportedPage
--- @ do Reported pastes.
--- @ trigger getPastes
--- @ next pastePage
--- @ next reportedPage
+-- | List the reported pastes.
 handle :: Controller ()
 handle = do
   pn <- getPagination

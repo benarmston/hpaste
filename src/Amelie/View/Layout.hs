@@ -15,7 +15,6 @@ import           Data.Monoid.Operator        ((++))
 import           Prelude                     hiding ((++))
 import           Text.Blaze.Html5            as H hiding (map,nav)
 import qualified Text.Blaze.Html5.Attributes as A
-import           Text.Blaze (preEscapedText)
 
 -- | Render the page in a layout.
 layoutPage :: Page -> Html

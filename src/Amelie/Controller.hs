@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# OPTIONS -Wall #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -23,10 +24,11 @@ import Control.Monad.Reader       (runReaderT)
 import Data.ByteString            (ByteString)
 import Data.ByteString.UTF8       (toString)
 import Data.Text.Lazy             (Text,toStrict)
-import Database.PostgreSQL.Simple (Pool,withPoolConnection)
+import Database.PostgreSQL.Base   (withPoolConnection)
+import Database.PostgreSQL.Simple (Pool)
 import Safe                       (readMay)
-import Snap.Types                 (Snap,writeText,redirect,getParam)
-import Snap.Types                 (modifyResponse,setContentType)
+import Snap.Core                  (Snap,writeText,redirect,getParam)
+import Snap.Core                  (modifyResponse,setContentType)
 import Text.Blaze                 (Html)
 import Text.Blaze.Renderer.Text   (renderHtml)
 

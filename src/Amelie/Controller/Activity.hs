@@ -16,9 +16,7 @@ import Amelie.View.Activity    (page)
 
 import Control.Monad.Env       (env)
 
--- @ label activityPage
--- @ do Show Amelie project commit activity.
--- @ trigger getCommits
+-- | Display commit history.
 handle :: Controller ()
 handle = do
   html <- cache Key.Activity $ do

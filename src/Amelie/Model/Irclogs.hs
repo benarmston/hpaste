@@ -1,5 +1,7 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS -fno-warn-name-shadowing #-}
+
 module Amelie.Model.Irclogs where
 
 import           Amelie.Types
@@ -48,7 +50,7 @@ getNarrowedLogs channel year time = do
   where narrowBy pred events =
           case find pred (filter crap events) of
             Nothing -> Nothing
-            Just res -> Just $ narrow count pred (filter crap events)
+            Just _res -> Just $ narrow count pred (filter crap events)
         count = 50
         datetime   = T.pack $ year ++ "-" ++ replace "-" ":" time
         dateminute = T.pack $ year ++ "-" ++ replace "-" ":" (reverse . drop 2 . reverse $ time)

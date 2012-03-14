@@ -1,8 +1,9 @@
-{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
 
 -- | Paste model.
 
@@ -15,7 +16,6 @@ module Amelie.Model.Paste
   ,getSomePastes
   ,countPublicPastes
   ,generateHints
-  ,generateSteps
   ,getHints)
   where
 
@@ -23,22 +23,19 @@ import Amelie.Types
 import Amelie.Model
 import Amelie.Model.Announcer
 
-import Control.Applicative          ((<$>),(<|>))
-import Control.Exception            (handle,SomeException)
+import Control.Applicative    ((<$>),(<|>))
 import Control.Monad
 import Control.Monad.Env
 import Control.Monad.IO
 import Data.Char
-import Data.List                    (find,intercalate)
-import Data.Maybe                   (fromMaybe,listToMaybe)
-import Data.Monoid.Operator         ((++))
-import Data.Text                    (Text,unpack,pack)
-import Data.Text.IO                 as T (writeFile)
-import Data.Text.Lazy               (fromStrict)
-import Language.Haskell.Exts
+import Data.List              (find,intercalate)
+import Data.Maybe             (fromMaybe,listToMaybe)
+import Data.Monoid.Operator   ((++))
+import Data.Text              (Text,unpack,pack)
+import Data.Text.IO           as T (writeFile)
+import Data.Text.Lazy         (fromStrict)
 import Language.Haskell.HLint
-import Language.Haskell.Stepeval
-import Prelude                      hiding ((++))
+import Prelude                hiding ((++))
 import System.Directory
 import System.FilePath
 
@@ -49,8 +46,6 @@ countPublicPastes = do
                          ,"FROM public_toplevel_paste"]
   return $ fromMaybe 0 rows
 
--- @ label getLatestPastes
--- @ task Get latest pastes.
 -- | Get the latest pastes.
 getLatestPastes :: Model [Paste]
 getLatestPastes =
@@ -59,8 +54,6 @@ getLatestPastes =
                 ,"ORDER BY id DESC"
                 ,"LIMIT 20"]
 
--- @ label getPastes
--- @ task Get some pastes.
 -- | Get some paginated pastes.
 getSomePastes :: Pagination -> Model [Paste]
 getSomePastes Pagination{..} =
@@ -70,8 +63,6 @@ getSomePastes Pagination{..} =
                 ,"OFFSET " ++ show (max 0 (pnPage - 1) * pnLimit)
                 ,"LIMIT " ++ show pnLimit]
 
--- @ label getPasteById
--- @ task Get paste by id.
 -- | Get a paste by its id.
 getPasteById :: PasteId -> Model (Maybe Paste)
 getPasteById pid =
@@ -97,8 +88,6 @@ createOrEdit langs chans paste@PasteSubmit{..} = do
     Just pid -> do updatePaste pid paste
                    return $ Just pid
 
--- @ label createPaste
--- @ task Create paste.
 -- | Create a new paste (possibly editing an existing one).
 createPaste :: [Language] -> [Channel] -> PasteSubmit -> Model (Maybe PasteId)
 createPaste langs chans ps@PasteSubmit{..} = do
@@ -157,30 +146,6 @@ validNick s = first && all ok s && length s > 0 where
   ok c = isDigit c || isLetter c || elem c "-_/\\;()[]{}?`'"
   first = all (\c -> isDigit c || isLetter c) $ take 1 s
 
--- | Get the steps.
-generateSteps :: Text -> String -> Model [Text]
-generateSteps mod expr = do
-  prelude <- getPrelude (unpack mod)
-  case parseExp expr of
-    ParseOk e       -> io $ handle (\(x :: SomeException) -> return (err x)) $ do
-      let steps = map format $ take 50 $ itereval prelude e
-          !_ = length $ show $ concat steps
-      return $ map pack steps
-    ParseFailed _ g -> return ["Error: " ++ pack g]
-
-  where format = prettyPrint
-        err e = ["Error: " ++ pack (show e)]
-
--- | Get the stepeval prelude.
-getPrelude :: String -> Model [Decl]
-getPrelude extra = do
-  c <- env modelStateConfig
-  io $ handle (\e -> return [] `const` (e :: SomeException)) $ do
-    result <- readFile (configStepevalPrelude c)
-    case parseModule (result ++ "\n\n" ++ extra) of
-      ParseOk (Module _ _ _ _ _ _ ds) -> return ds
-      _                               -> return []
-
 -- | Get hints for a Haskell paste from hlint.
 generateHintsForPaste :: PasteSubmit -> PasteId -> Model [Suggestion]
 generateHintsForPaste PasteSubmit{..} (fromIntegral -> pid :: Integer) =
@@ -203,8 +168,6 @@ getHints pid =
         ,"WHERE paste = ?"]
         (Only pid)
 
--- @ label updatePaste
--- @ task Update paste.
 -- | Update an existing paste.
 updatePaste :: PasteId -> PasteSubmit -> Model ()
 updatePaste pid PasteSubmit{..} = do

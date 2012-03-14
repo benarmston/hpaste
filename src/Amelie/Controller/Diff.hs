@@ -13,10 +13,7 @@ import Amelie.Controller.Paste (withPasteKey)
 import Amelie.Model
 import Amelie.View.Diff        (page)
 
--- @ label diffPage
--- @ do Diff two pastes.
--- @ trigger getPasteById
--- @ trigger getPasteById
+-- | Diff one paste with another.
 handle :: Controller ()
 handle = do
   withPasteKey "this" $ \this ->

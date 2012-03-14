@@ -18,19 +18,9 @@ import Amelie.View.New         as New (page)
 
 import Control.Applicative
 import Data.Text.Encoding      (decodeUtf8)
-import Snap.Types
+import Snap.Core
 
--- @ label annotatePage
--- @ do Annotate a paste.
--- @ trigger getPasteById
--- @ trigger updatePaste
--- @ next pastePage
-
--- @ label newPastePage
--- @ do Create a new paste.
--- @ trigger createPaste
--- @ next pastePage
-
+-- | Make a new paste.
 handle :: Controller ()
 handle = do
   chans <- model $ getChannels

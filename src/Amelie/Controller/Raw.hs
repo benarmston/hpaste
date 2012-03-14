@@ -20,7 +20,7 @@ import Data.Maybe
 import Data.Text.Lazy       (fromStrict)
 import Prelude              hiding ((++))
 import Safe
-import Snap.Types
+import Snap.Core
 
 -- | Handle the paste page.
 handle :: Controller ()

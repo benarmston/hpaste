@@ -22,7 +22,7 @@ import Control.Monad.Reader       (ReaderT,MonadReader)
 import Control.Monad.Trans        (MonadIO)
 import Data.Text.Lazy             (Text)
 import Database.PostgreSQL.Simple (Connection)
-import Snap.Types                 (Snap,MonadSnap)
+import Snap.Core                  (Snap,MonadSnap)
 
 -- | The state accessible to the controller (DB/session stuff).
 data ControllerState = ControllerState {

@@ -17,12 +17,7 @@ import Amelie.Model.Paste      (getLatestPastes)
 import Amelie.Types.Cache      as Key
 import Amelie.View.Home        (page)
 
--- @ label homePage
--- @ do Home page.
--- @ trigger getLatestPastes
--- @ next pastePage
--- @ next newPastePage
--- @ next activityPage
+-- | Handle the home page, display a simple list and paste form.
 handle :: Controller ()
 handle = do
   html <- cache Key.Home $ do

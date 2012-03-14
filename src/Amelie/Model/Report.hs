@@ -18,8 +18,6 @@ import Data.Maybe
 import Data.Monoid.Operator ((++))
 import Prelude              hiding ((++))
 
--- @ label getReports
--- @ task Get some reports.
 -- | Get some paginated reports.
 getSomeReports :: Pagination -> Model [Report]
 getSomeReports Pagination{..} =
@@ -36,8 +34,6 @@ countReports = do
                          ,"FROM report"]
   return $ fromMaybe 0 rows
 
--- @ label createReport
--- @ task Create report.
 -- | Create a new report.
 createReport :: ReportSubmit -> Model (Maybe ReportId)
 createReport ReportSubmit{..} = do

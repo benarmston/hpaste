@@ -11,7 +11,7 @@ import Amelie.Controller  (outputText)
 import Amelie.Model
 import Amelie.View.Script (script)
 
-import Snap.Types         (modifyResponse,setContentType)
+import Snap.Core          (modifyResponse,setContentType)
 
 handle :: Controller ()
 handle = do

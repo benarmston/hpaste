@@ -13,7 +13,6 @@ import           Amelie.Controller
 import           Amelie.Model
 import           Amelie.Model.Paste   (getPasteById)
 import           Amelie.Model.Report
-import           Amelie.Types
 import           Amelie.View.Report
 import qualified Amelie.View.Thanks   as Thanks
 
@@ -24,7 +23,7 @@ import           Data.Monoid.Operator ((++))
 import           Data.Text            (unpack)
 import           Prelude              hiding ((++))
 import           Safe
-import           Snap.Types
+import           Snap.Core
 import           Text.Blaze.Html5     as H hiding (output,map,body)
 import           Text.Formlet
 

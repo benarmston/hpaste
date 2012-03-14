@@ -29,7 +29,7 @@ import Database.PostgreSQL.Simple.Param        (Param(..),Action(..))
 import Database.PostgreSQL.Simple.QueryResults (QueryResults(..))
 import Database.PostgreSQL.Simple.Result       (Result(..))
 import Language.Haskell.HLint                  (Severity)
-import Snap.Types                              (Params)
+import Snap.Core                               (Params)
 import Text.Blaze                              (ToHtml(..),toHtml)
 import Text.Blaze.Html5                        (Html)
 
